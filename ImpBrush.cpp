@@ -1,6 +1,6 @@
 //
 // ImpBrush.cpp
-//
+// insert comment
 // The implementation of virtual brush. All the other brushes inherit from it.
 //
 
