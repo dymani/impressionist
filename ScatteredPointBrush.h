@@ -1,16 +1,17 @@
-#ifndef LINE_BRUSH_H
-#define LINE_BRUSH_H
+#ifndef SCATTERED_POINT_BRUSH_H
+#define SCATTERED_POINT_BRUSH_H
 
 #include "ImpBrush.h"
 
-class LineBrush : public ImpBrush {
+class ScatteredPointBrush : public ImpBrush {
 public:
-	LineBrush(ImpressionistDoc* pDoc = NULL, char* name = NULL);
+	ScatteredPointBrush(ImpressionistDoc* pDoc = NULL, char* name = NULL);
 	void BrushBegin(const Point source, const Point target);
 	void BrushMove(const Point source, const Point target);
 	void BrushEnd(const Point source, const Point target);
 private:
 	int m_size;
+	float m_density;
 };
 
 #endif
