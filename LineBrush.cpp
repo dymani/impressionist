@@ -5,10 +5,10 @@
 
 #include <cmath>
 
-const float PI = 3.14159;
+const double PI = 3.14159;
 
 LineBrush::LineBrush(ImpressionistDoc* pDoc, char* name)
-	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::SLIDER), m_prevTarget(-1, 0) {
+	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::GRADIENT), m_prevTarget(-1, 0) {
 }
 
 void LineBrush::BrushBegin(const Point source, const Point target) {
@@ -32,20 +32,19 @@ void LineBrush::BrushMove(const Point source, const Point target) {
 		return;
 	}
 
-	// return if it is the first draw
-	if (m_prevTarget.x == -1) {
+	// return if it is the first draw of the movement
+	if (m_mode == Mode::MOVEMENT && m_prevTarget.x == -1) {
 		m_prevTarget = target;
 		return;
 	}		
 
 	updateAttributes(source, target);
 
-	glLineWidth((float)m_width);
-
-	double dx = m_size / 2.0 * cos(m_angle * PI / 180);
-	double dy = m_size / 2.0 * sin(m_angle * PI / 180);
 	glBegin(GL_LINE_STRIP);
 		SetColor(source);
+		glLineWidth((float)m_width);
+		double dx = m_size / 2.0 * cos(m_angle * PI / 180);
+		double dy = m_size / 2.0 * sin(m_angle * PI / 180);
 		glVertex2d(target.x + dx, target.y + dy);
 		glVertex2d(target.x - dx, target.y - dy);
 	glEnd();
@@ -57,27 +56,61 @@ void LineBrush::BrushEnd(const Point source, const Point target) {
 	m_prevTarget.x = -1;
 }
 
+inline GLubyte getLuma(const GLubyte color[]) {
+	return GLubyte((color[0] + color[0] + color[1] + color[1] + color[1] + color[2]) / 6);
+}
+
 void LineBrush::updateAttributes(const Point source, const Point target) {
 	ImpressionistDoc* pDoc = GetDocument();
 
+	// TODO: update mode from gui menu
 	// 0 - slider/mouse, 1 - gradient, 2 - movement
-	m_mode = Mode::MOVEMENT;
+	// m_mode = Mode::GRADIENT;
 
 	m_size = pDoc->getSize();
 
+	GLubyte color[3];
+	int sumX = 0, sumY = 0;
 	switch (m_mode) {
 		case Mode::SLIDER:
+			// TODO: update angle from slider
 			// m_angle = pDoc->getAngle();
 			m_angle = 30;
 			break;
 		case Mode::GRADIENT:
-			m_angle = 30;
+			for (int i = 0; i < 3; ++i) {
+				for (int j = 0, luma; j < 3; ++j) {					
+					luma = 0;
+					// gaussian 3x3 kernel
+					/*for (int y = 0; y < 3; ++y) {
+						for (int x = 0; x < 3; ++x) {
+							memcpy(color, pDoc->GetOriginalPixel(source.x - 2 + j + x, source.y - 2 + i + y), 3);
+							luma += getLuma(color) * m_gaussian[y * 3 + x];
+						}
+					}
+					sumX += luma * m_sobelX[i * 3 + j] / 16;
+					sumY += luma * m_sobelY[i * 3 + j] / 16;*/	
+
+					// gaussian 5x5 kernel
+					for (int y = 0; y < 5; ++y) {
+						for (int x = 0; x < 5; ++x) {
+							memcpy(color, pDoc->GetOriginalPixel(source.x - 3 + j + x, source.y - 3 + i + y), 3);
+							luma += getLuma(color) * m_gaussian5[y * 5 + x];
+						}
+					}
+					sumX += luma * m_sobelX[i * 3 + j] / 273;
+					sumY += luma * m_sobelY[i * 3 + j] / 273;
+				}
+			}			
+
+			m_angle = int(atan2(sumX, sumY) / PI * 180);
 			break;
 		case Mode::MOVEMENT:
-			m_angle = atan2(m_prevTarget.y - target.y, m_prevTarget.x - target.x) / PI * 180;
+			m_angle = int(atan2(m_prevTarget.y - target.y, m_prevTarget.x - target.x) / PI * 180);
 			break;
 	}
 
+	// TODO: update width from slider
 	// m_width = pDoc->getWdith();
 	m_width = 1;
 	
