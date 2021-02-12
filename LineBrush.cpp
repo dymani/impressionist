@@ -38,15 +38,16 @@ void LineBrush::BrushMove(const Point source, const Point target) {
 		return;
 	}		
 
-	updateAttributes(source, target);
+	updateAttributes(source, target);;
 
-	glBegin(GL_LINE_STRIP);
+	glBegin(GL_TRIANGLE_STRIP);
 		SetColor(source);
-		glLineWidth((float)m_width);
 		double dx = m_size / 2.0 * cos(m_angle * PI / 180);
 		double dy = m_size / 2.0 * sin(m_angle * PI / 180);
-		glVertex2d(target.x + dx, target.y + dy);
-		glVertex2d(target.x - dx, target.y - dy);
+		glVertex2d(target.x + dx, target.y + dy - m_width / 2.0);
+		glVertex2d(target.x - dx, target.y - dy - m_width / 2.0);
+		glVertex2d(target.x + dx, target.y + dy + m_width / 2.0);
+		glVertex2d(target.x - dx, target.y - dy + m_width / 2.0);
 	glEnd();
 
 	m_prevTarget = target;
