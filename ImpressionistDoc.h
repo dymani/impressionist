@@ -12,6 +12,8 @@
 
 class ImpressionistUI;
 
+class LineOverlay;
+
 class ImpressionistDoc 
 {
 public:
@@ -46,7 +48,9 @@ public:
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
 	// Size of the brush.
-	int m_nSize;							
+	int m_nSize;				
+
+	LineOverlay* m_lineOverlay;
 
 	ImpressionistUI*	m_pUI;
 
