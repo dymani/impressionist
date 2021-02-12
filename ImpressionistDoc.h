@@ -12,6 +12,8 @@
 
 class ImpressionistUI;
 
+class LineOverlay;
+
 class ImpressionistDoc 
 {
 public:
@@ -56,6 +58,9 @@ public:
 	int m_width;
 	int m_angle;
 	int m_alpha;
+	int m_nSize;				
+
+	LineOverlay* m_lineOverlay;
 
 	ImpressionistUI*	m_pUI;
 
