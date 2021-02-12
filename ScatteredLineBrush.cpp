@@ -36,7 +36,7 @@ void ScatteredLineBrush::BrushMove(const Point source, const Point target) {
 		sx = rand() % m_size - (int)(m_size / 2);
 		sy = rand() % m_size - (int)(m_size / 2);
 		glBegin(GL_TRIANGLE_STRIP);
-			SetColor(Point(source.x + sx, source.y + sy));
+			SetColor(Point(source.x + sx, source.y + sy), pDoc->getAlpha());
 			dx = m_size / 2.0 * cos(m_angle * PI / 180);
 			dy = m_size / 2.0 * sin(m_angle * PI / 180);
 			glVertex2d((double)target.x + sx + dx, (double)target.y + sy + dy - m_width / 2.0);

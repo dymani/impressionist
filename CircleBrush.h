@@ -18,7 +18,7 @@ public:
 	void BrushBegin(const Point source, const Point target);
 	void BrushMove(const Point source, const Point target);
 	void BrushEnd(const Point source, const Point target);
-	void MakeCircle(const Point source, const Point target, double r, bool even);
+	void MakeCircle(ImpressionistDoc* doc, const Point source, const Point target, double r, bool even);
 	char* BrushName(void);
 };
 

@@ -33,7 +33,7 @@ void ScatteredPointBrush::BrushMove(const Point source, const Point target) {
 			dx = rand() % m_size - (int)(m_size / 2);
 			dy = rand() % m_size - (int)(m_size / 2);
 
-			SetColor(Point(source.x + dx, source.y + dy));
+			SetColor(Point(source.x + dx, source.y + dy), pDoc->getAlpha());
 
 			glVertex2d((double)target.x + dx, (double)target.y + dy);
 		}	
