@@ -49,6 +49,8 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ScatteredCircleBrush.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="ScatteredLineBrush.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -88,6 +90,8 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ScatteredCircleBrush.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="ScatteredLineBrush.h">
       <Filter>Header Files</Filter>
     </ClInclude>
