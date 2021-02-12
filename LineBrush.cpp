@@ -41,7 +41,7 @@ void LineBrush::BrushMove(const Point source, const Point target) {
 	updateAttributes(source, target);;
 
 	glBegin(GL_TRIANGLE_STRIP);
-		SetColor(source);
+		SetColor(source, pDoc->getAlpha());
 		double dx = m_size / 2.0 * cos(m_angle * PI / 180);
 		double dy = m_size / 2.0 * sin(m_angle * PI / 180);
 		glVertex2d(target.x + dx, target.y + dy - m_width / 2.0);

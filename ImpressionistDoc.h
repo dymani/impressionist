@@ -27,6 +27,12 @@ public:
 	void	setBrushType(int type);			// called by the UI to set the brushType
 	int		getSize();						// get the UI size
 	void	setSize(int size);				// set the UI size
+	int		getWidth();						// get the line width
+	void	setWidth(int width);			// set the line width
+	int		getAngle();						// get the line angle
+	void	setAngle(int angle);			// set the line angle
+	int 	getAlpha();						// get the alpha value
+	void	setAlpha(int alpha);			// set the alpha value
 	char*	getImageName();					// get the current image name
 	
 
@@ -46,7 +52,10 @@ public:
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
 	// Size of the brush.
-	int m_nSize;							
+	int m_nSize;	
+	int m_width;
+	int m_angle;
+	int m_alpha;
 
 	ImpressionistUI*	m_pUI;
 

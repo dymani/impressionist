@@ -35,21 +35,22 @@ void CircleBrush::BrushMove(const Point source, const Point target)
 
 	// Get the radius
 	float r = (double)pDoc->getSize() / 2.0f;
+	// Decide the generation method, as odd size and even size are a bit different from each other
 	if (pDoc->getSize() % 2 == 0) {
-		MakeCircle(source, target, r, true);
+		MakeCircle(pDoc, source, target, r, true);
 	}
 	else {
-		MakeCircle(source, target, r, false);
+		MakeCircle(pDoc, source, target, r, false);
 	}
 
 }
 
-void CircleBrush::MakeCircle(const Point source, const Point target, double r, bool even) {
+void CircleBrush::MakeCircle(ImpressionistDoc* doc, const Point source, const Point target, double r, bool even) {
 	// Get the theta of each segment
 	float dtheta = 2.0f * M_PI / 360.0f;
 
 	glBegin(GL_POLYGON);
-		SetColor(source);
+		SetColor(source, doc->getAlpha());
 
 		float theta = 0.0;
 

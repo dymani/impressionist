@@ -80,6 +80,16 @@ char* ImpressionistDoc::getImageName()
 void ImpressionistDoc::setBrushType(int type)
 {
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[type];
+
+	// Check if certain attributes are available for certain brush types
+	if (type == BRUSH_LINES || type == BRUSH_SCATTERED_LINES) {
+		m_pUI->m_LineWidthSlider->activate();
+		m_pUI->m_LineAngleSlider->activate();
+	}
+	else {
+		m_pUI->m_LineWidthSlider->deactivate();
+		m_pUI->m_LineAngleSlider->deactivate();
+	}
 }
 
 //---------------------------------------------------------
@@ -88,6 +98,30 @@ void ImpressionistDoc::setBrushType(int type)
 int ImpressionistDoc::getSize()
 {
 	return m_pUI->getSize();
+}
+
+//---------------------------------------------------------
+// Returns the line width.
+//---------------------------------------------------------
+int ImpressionistDoc::getWidth()
+{
+	return m_pUI->getWidth();
+}
+
+//---------------------------------------------------------
+// Returns the line angle.
+//---------------------------------------------------------
+int ImpressionistDoc::getAngle()
+{
+	return m_pUI->getAngle();
+}
+
+//---------------------------------------------------------
+// Returns the alpha value of the brush.
+//---------------------------------------------------------
+int ImpressionistDoc::getAlpha()
+{
+	return m_pUI->getAlpha();
 }
 
 //---------------------------------------------------------
