@@ -34,35 +34,33 @@ void CircleBrush::BrushMove(const Point source, const Point target)
 	}
 
 	// Get the radius
-	double r = (double)pDoc->getSize() / 2.0;
+	float r = (double)pDoc->getSize() / 2.0f;
 	if (pDoc->getSize() % 2 == 0) {
-		Circle(source, target, r, true);
+		MakeCircle(source, target, r, true);
 	}
 	else {
-		Circle(source, target, r, false);
+		MakeCircle(source, target, r, false);
 	}
 
 }
 
-void CircleBrush::Circle(const Point source, const Point target, double r, bool even) {
+void CircleBrush::MakeCircle(const Point source, const Point target, double r, bool even) {
 	// Get the theta of each segment
-	double dtheta = 2.0 * (double)M_PI / 360.0;
+	float dtheta = 2.0f * M_PI / 360.0f;
 
 	glBegin(GL_POLYGON);
 		SetColor(source);
 
-		double theta = 0.0;
+		float theta = 0.0;
 
 		if (even) {
-			for (int i = 0; i < 360; i++) {
-				glVertex2d((double)target.x + (r * (double)cosf(theta)), (double)target.y + (r * (double)sinf(theta)));
-				theta += dtheta;
+			for (; theta < 2.0f * M_PI; theta += dtheta) {
+				glVertex2f(target.x + (r * cosf(theta)), target.y - (r * sinf(theta)));
 			}
 		}
 		else {
-			for (int i = 0; i < 360; i++) {
-				glVertex2i(target.x + (r * (double)cosf(theta)), target.y + (r * (double)sinf(theta)));
-				theta += dtheta;
+			for (; theta < 2.0f * M_PI; theta += dtheta) {
+				glVertex2i(target.x + (r * cosf(theta)), target.y + (r * sinf(theta)));
 			}
 		}
 
