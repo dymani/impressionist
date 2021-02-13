@@ -15,8 +15,12 @@ public:
 		if (mode >= 0 && mode < 3)
 			m_mode = static_cast<Mode>(mode);
 	}
-private:
+	Mode getMode() {
+		return m_mode;
+	}
+protected:
 	void updateAttributes(const Point source, const Point target);
+	void drawLine(const Point source, const Point target);
 	int m_size, m_width, m_angle;	
 	Mode m_mode;
 	Point m_prevTarget;

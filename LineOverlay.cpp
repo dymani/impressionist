@@ -10,16 +10,23 @@
 const double PI = 3.14159;
 
 LineOverlay::LineOverlay(ImpressionistDoc* pDoc)
-	: m_pDoc(pDoc), m_size(1), m_angle(0) {
+	: m_pDoc(pDoc), m_size(1), m_angle(0), m_validBrush(false) {
 }
 
 void LineOverlay::setStart(const Point target) {
-	m_start = target;
-	m_size = m_pDoc->getSize();
-	m_angle = m_pDoc->getAngle();
+	m_validBrush = false;
+
+	if (dynamic_cast<LineBrush*>(m_pDoc->m_pCurrentBrush)
+		&& dynamic_cast<LineBrush*>(m_pDoc->m_pCurrentBrush)->getMode() == LineBrush::Mode::SLIDER) {
+		m_validBrush = true;
+		m_start = target;
+		m_size = m_pDoc->getSize();
+		m_angle = m_pDoc->getAngle();
+	}
 }
 
 void LineOverlay::draw(const Point target) {
+	if (!m_validBrush) return;
 	
 	int dx = target.x - m_start.x;
 	int dy = target.y - m_start.y;
@@ -35,10 +42,9 @@ void LineOverlay::draw(const Point target) {
 }
 
 void LineOverlay::release(const Point target) {
-	if (dynamic_cast<LineBrush*>(m_pDoc->m_pCurrentBrush)
-		|| dynamic_cast<ScatteredLineBrush*>(m_pDoc->m_pCurrentBrush)) {
-		m_pDoc->setSize(m_size);
-		m_pDoc->m_pUI->m_BrushSizeSlider->value(m_size);
-		m_pDoc->setAngle(m_angle);
-	}	
+	if (!m_validBrush) return;
+	
+	m_pDoc->setSize(m_size);
+	m_pDoc->m_pUI->m_BrushSizeSlider->value(m_size);
+	m_pDoc->setAngle(m_angle);
 }

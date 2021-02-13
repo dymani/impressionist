@@ -100,10 +100,8 @@ void ImpressionistDoc::setBrushType(int type)
 
 void ImpressionistDoc::setStrokeDirectionType(int type) {
 	if (dynamic_cast<LineBrush*>(m_pCurrentBrush)) {
-		dynamic_cast<LineBrush*>(m_pCurrentBrush)->setMode(type);
-	}
-	else if (dynamic_cast<ScatteredLineBrush*>(m_pCurrentBrush)) {
-		// dynamic_cast<ScatteredLineBrush*>(m_pCurrentBrush)->setMode(type);
+		dynamic_cast<LineBrush*>(ImpBrush::c_pBrushes[BRUSH_LINES])->setMode(type);
+		dynamic_cast<LineBrush*>(ImpBrush::c_pBrushes[BRUSH_SCATTERED_LINES])->setMode(type);
 	}
 }
 

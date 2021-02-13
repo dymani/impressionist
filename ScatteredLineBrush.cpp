@@ -8,44 +8,37 @@
 const double PI = 3.14159;
 
 ScatteredLineBrush::ScatteredLineBrush(ImpressionistDoc* pDoc, char* name)
-	: ImpBrush(pDoc, name), m_size(1), m_width(40), m_angle(0), m_numLines(4) {
-}
-
-void ScatteredLineBrush::BrushBegin(const Point source, const Point target) {
-	ImpressionistDoc* pDoc = GetDocument();
-		
-	m_size = pDoc->getSize();
-	m_width = 10;
-	m_angle = 45;
-	m_numLines = 4;
-
-	BrushMove(source, target);
+	: LineBrush(pDoc, name), m_numLines(4) {
 }
 
 void ScatteredLineBrush::BrushMove(const Point source, const Point target) {
 	ImpressionistDoc* pDoc = GetDocument();
 
 	if (pDoc == NULL) {
-		printf("LineBrush::BrushMove  document is NULL\n");
+		printf("ScatteredLineBrush::BrushMove  document is NULL\n");
 		return;
 	}
 
+	// return if it is the first draw of the movement
+	if (m_mode == Mode::MOVEMENT && m_prevTarget.x == -1) {
+		m_prevTarget = target;
+		return;
+	}
+	
+	m_numLines = rand() % 2 + 3;
+
 	int sx, sy;
-	double dx, dy;
 	for (int i = 0; i < m_numLines; ++i) {
 		sx = rand() % m_size - (int)(m_size / 2);
 		sy = rand() % m_size - (int)(m_size / 2);
-		glBegin(GL_TRIANGLE_STRIP);
-			SetColor(Point(source.x + sx, source.y + sy), pDoc->getAlpha());
-			dx = m_size / 2.0 * cos(m_angle * PI / 180);
-			dy = m_size / 2.0 * sin(m_angle * PI / 180);
-			glVertex2d((double)target.x + sx + dx, (double)target.y + sy + dy - m_width / 2.0);
-			glVertex2d((double)target.x + sx - dx, (double)target.y + sy - dy - m_width / 2.0);
-			glVertex2d((double)target.x + sx + dx, (double)target.y + sy + dy + m_width / 2.0);
-			glVertex2d((double)target.x + sx - dx, (double)target.y + sy - dy + m_width / 2.0);
-		glEnd();
-	}
-}
+		
+		updateAttributes(Point(source.x + sx, source.y + sy), Point(target.x + sx, target.y + sy));
 
-void ScatteredLineBrush::BrushEnd(const Point source, const Point target) {
+		if (m_mode == Mode::MOVEMENT) // correct angle for movement brush
+			m_angle = int(atan2(m_prevTarget.y - target.y, m_prevTarget.x - target.x) / PI * 180);
+
+		drawLine(Point(source.x + sx, source.y + sy), Point(target.x + sx, target.y + sy));
+	}
+
+	m_prevTarget = target;
 }

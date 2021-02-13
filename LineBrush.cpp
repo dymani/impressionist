@@ -36,21 +36,11 @@ void LineBrush::BrushMove(const Point source, const Point target) {
 	if (m_mode == Mode::MOVEMENT && m_prevTarget.x == -1) {
 		m_prevTarget = target;
 		return;
-	}		
+	}	
 
 	updateAttributes(source, target);;
 
-	glBegin(GL_TRIANGLE_STRIP);
-		SetColor(source, pDoc->getAlpha());
-		double sinT = sin(m_angle * PI / 180);
-		double cosT = cos(m_angle * PI / 180);
-		double x = m_size / 2.0;
-		double y = m_width / 2.0;
-		glVertex2d(target.x + x * cosT - y * sinT, target.y + x * sinT + y * cosT);
-		glVertex2d(target.x - x * cosT - y * sinT, target.y - x * sinT + y * cosT);
-		glVertex2d(target.x + x * cosT + y * sinT, target.y + x * sinT - y * cosT);
-		glVertex2d(target.x - x * cosT + y * sinT, target.y - x * sinT - y * cosT);
-	glEnd();
+	drawLine(source, target);
 
 	m_prevTarget = target;
 }
@@ -109,4 +99,21 @@ void LineBrush::updateAttributes(const Point source, const Point target) {
 
 	m_width = pDoc->getWidth();
 	
+}
+
+
+void LineBrush::drawLine(const Point source, const Point target) {
+	ImpressionistDoc* pDoc = GetDocument();
+
+	glBegin(GL_TRIANGLE_STRIP);
+		SetColor(source, pDoc->getAlpha());
+		double sinT = sin(m_angle * PI / 180);
+		double cosT = cos(m_angle * PI / 180);
+		double x = m_size / 2.0;
+		double y = m_width / 2.0;
+		glVertex2d(target.x + x * cosT - y * sinT, target.y + x * sinT + y * cosT);
+		glVertex2d(target.x - x * cosT - y * sinT, target.y - x * sinT + y * cosT);
+		glVertex2d(target.x + x * cosT + y * sinT, target.y + x * sinT - y * cosT);
+		glVertex2d(target.x - x * cosT + y * sinT, target.y - x * sinT - y * cosT);
+	glEnd();
 }
