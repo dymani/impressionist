@@ -16,8 +16,7 @@ LineOverlay::LineOverlay(ImpressionistDoc* pDoc)
 void LineOverlay::setStart(const Point target) {
 	m_start = target;
 	m_size = m_pDoc->getSize();
-	// TODO: save previous angle
-	//m_angle = m_pDoc->getAngle();
+	m_angle = m_pDoc->getAngle();
 }
 
 void LineOverlay::draw(const Point target) {
@@ -40,7 +39,6 @@ void LineOverlay::release(const Point target) {
 		|| dynamic_cast<ScatteredLineBrush*>(m_pDoc->m_pCurrentBrush)) {
 		m_pDoc->setSize(m_size);
 		m_pDoc->m_pUI->m_BrushSizeSlider->value(m_size);
-		//TODO: set new angle
-		//m_pDoc->setAngle(m_angle);
+		m_pDoc->setAngle(m_angle);
 	}	
 }

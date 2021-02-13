@@ -158,9 +158,9 @@
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="CircleBrush.h" />
     <ClInclude Include="ImpBrush.h" />
-    <ClInclude Include="impressionist.h" />
-    <ClInclude Include="impressionistDoc.h" />
-    <ClInclude Include="impressionistUI.h" />
+    <ClInclude Include="Impressionist.h" />
+    <ClInclude Include="ImpressionistDoc.h" />
+    <ClInclude Include="ImpressionistUI.h" />
     <ClInclude Include="LineBrush.h" />
     <ClInclude Include="LineOverlay.h" />
     <ClInclude Include="OriginalView.h" />
