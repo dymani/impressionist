@@ -138,6 +138,22 @@ void PaintView::draw()
 		}
 	}
 
+	
+	glBegin(GL_QUADS);
+		glColor3ub(178, 178, 178);
+		glVertex2f(0, 0);
+		glVertex2f(m_nWindowWidth, 0);
+		glVertex2f(m_nWindowWidth, m_nWindowHeight - m_nDrawHeight);
+		glVertex2f(0, m_nWindowHeight - m_nDrawHeight);
+	glEnd();
+	glBegin(GL_QUADS);
+		glColor3ub(178, 178, 178);
+		glVertex2f(m_nDrawWidth, m_nWindowHeight - m_nDrawHeight);
+		glVertex2f(m_nWindowWidth, m_nWindowHeight - m_nDrawHeight);
+		glVertex2f(m_nWindowWidth, m_nWindowHeight);
+		glVertex2f(m_nDrawWidth, m_nWindowHeight);
+	glEnd();
+
 	glFlush();
 
 	#ifndef MESA
