@@ -13,6 +13,7 @@ public:
 	void release(const Point target);
 private:
 	ImpressionistDoc* m_pDoc;
+	bool m_validBrush;
 	Point m_start;
 	int m_size, m_angle;
 };

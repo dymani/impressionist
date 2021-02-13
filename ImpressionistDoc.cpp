@@ -87,12 +87,21 @@ void ImpressionistDoc::setBrushType(int type)
 
 	// Check if certain attributes are available for certain brush types
 	if (type == BRUSH_LINES || type == BRUSH_SCATTERED_LINES) {
+		m_pUI->m_strokeDirectionChoice->activate();
 		m_pUI->m_LineWidthSlider->activate();
 		m_pUI->m_LineAngleSlider->activate();
 	}
 	else {
+		m_pUI->m_strokeDirectionChoice->deactivate();
 		m_pUI->m_LineWidthSlider->deactivate();
 		m_pUI->m_LineAngleSlider->deactivate();
+	}
+}
+
+void ImpressionistDoc::setStrokeDirectionType(int type) {
+	if (dynamic_cast<LineBrush*>(m_pCurrentBrush)) {
+		dynamic_cast<LineBrush*>(ImpBrush::c_pBrushes[BRUSH_LINES])->setMode(type);
+		dynamic_cast<LineBrush*>(ImpBrush::c_pBrushes[BRUSH_SCATTERED_LINES])->setMode(type);
 	}
 }
 
@@ -116,6 +125,10 @@ int ImpressionistDoc::getWidth()
 	return m_pUI->getWidth();
 }
 
+void ImpressionistDoc::setWidth(int width) {
+	m_pUI->setWidth(width);
+}
+
 //---------------------------------------------------------
 // Returns the line angle.
 //---------------------------------------------------------
@@ -124,12 +137,20 @@ int ImpressionistDoc::getAngle()
 	return m_pUI->getAngle();
 }
 
+void ImpressionistDoc::setAngle(int angle) {
+	m_pUI->setAngle(angle);
+}
+
 //---------------------------------------------------------
 // Returns the alpha value of the brush.
 //---------------------------------------------------------
 int ImpressionistDoc::getAlpha()
 {
 	return m_pUI->getAlpha();
+}
+
+void ImpressionistDoc::setAlpha(int alpha) {
+	m_pUI->setAlpha(alpha);
 }
 
 //---------------------------------------------------------

@@ -5,10 +5,10 @@
 
 #include <cmath>
 
-const double PI = 3.14159;
+const double PI = 3.14159265358;
 
 LineBrush::LineBrush(ImpressionistDoc* pDoc, char* name)
-	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::GRADIENT), m_prevTarget(-1, 0) {
+	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::SLIDER), m_prevTarget(-1, 0) {
 }
 
 void LineBrush::BrushBegin(const Point source, const Point target) {
@@ -36,19 +36,11 @@ void LineBrush::BrushMove(const Point source, const Point target) {
 	if (m_mode == Mode::MOVEMENT && m_prevTarget.x == -1) {
 		m_prevTarget = target;
 		return;
-	}		
+	}	
 
 	updateAttributes(source, target);;
 
-	glBegin(GL_TRIANGLE_STRIP);
-		SetColor(source, pDoc->getAlpha());
-		double dx = m_size / 2.0 * cos(m_angle * PI / 180);
-		double dy = m_size / 2.0 * sin(m_angle * PI / 180);
-		glVertex2d(target.x + dx, target.y + dy - m_width / 2.0);
-		glVertex2d(target.x - dx, target.y - dy - m_width / 2.0);
-		glVertex2d(target.x + dx, target.y + dy + m_width / 2.0);
-		glVertex2d(target.x - dx, target.y - dy + m_width / 2.0);
-	glEnd();
+	drawLine(source, target);
 
 	m_prevTarget = target;
 }
@@ -64,19 +56,13 @@ inline GLubyte getLuma(const GLubyte color[]) {
 void LineBrush::updateAttributes(const Point source, const Point target) {
 	ImpressionistDoc* pDoc = GetDocument();
 
-	// TODO: update mode from gui menu
-	// 0 - slider/mouse, 1 - gradient, 2 - movement
-	// m_mode = Mode::GRADIENT;
-
 	m_size = pDoc->getSize();
 
 	GLubyte color[3];
 	int sumX = 0, sumY = 0;
 	switch (m_mode) {
 		case Mode::SLIDER:
-			// TODO: update angle from slider
-			// m_angle = pDoc->getAngle();
-			m_angle = 30;
+			m_angle = pDoc->getAngle();
 			break;
 		case Mode::GRADIENT:
 			for (int i = 0; i < 3; ++i) {
@@ -111,8 +97,23 @@ void LineBrush::updateAttributes(const Point source, const Point target) {
 			break;
 	}
 
-	// TODO: update width from slider
-	// m_width = pDoc->getWdith();
-	m_width = 1;
+	m_width = pDoc->getWidth();
 	
+}
+
+
+void LineBrush::drawLine(const Point source, const Point target) {
+	ImpressionistDoc* pDoc = GetDocument();
+
+	glBegin(GL_TRIANGLE_STRIP);
+		SetColor(source, pDoc->getAlpha());
+		double sinT = sin(m_angle * PI / 180);
+		double cosT = cos(m_angle * PI / 180);
+		double x = m_size / 2.0;
+		double y = m_width / 2.0;
+		glVertex2d(target.x + x * cosT - y * sinT, target.y + x * sinT + y * cosT);
+		glVertex2d(target.x - x * cosT - y * sinT, target.y - x * sinT + y * cosT);
+		glVertex2d(target.x + x * cosT + y * sinT, target.y + x * sinT - y * cosT);
+		glVertex2d(target.x - x * cosT + y * sinT, target.y - x * sinT - y * cosT);
+	glEnd();
 }

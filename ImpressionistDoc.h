@@ -27,6 +27,7 @@ public:
 
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
 	void	setBrushType(int type);			// called by the UI to set the brushType
+	void    setStrokeDirectionType(int type); // called by the UI to set the stroke direction type
 	int		getSize();						// get the UI size
 	void	setSize(int size);				// set the UI size
 	int		getWidth();						// get the line width
@@ -57,8 +58,7 @@ public:
 	int m_nSize;	
 	int m_width;
 	int m_angle;
-	int m_alpha;
-	int m_nSize;				
+	int m_alpha;				
 
 	LineOverlay* m_lineOverlay;
 

@@ -270,6 +270,16 @@ void ImpressionistUI::cb_clear_canvas_button(Fl_Widget* o, void* v)
 }
 
 
+void ImpressionistUI::cb_strokeDirectionChoice(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+
+	int type = (int)v;
+
+	pDoc->setStrokeDirectionType(type);
+}
+
 //-----------------------------------------------------------
 // Updates the brush size to use from the value of the size
 // slider
@@ -383,10 +393,10 @@ int ImpressionistUI::getWidth()
 //-------------------------------------------------
 void ImpressionistUI::setWidth(int width)
 {
+	if (width < 0) width = 0;
+	if (width > 40) width = 40;
 	m_width = width;
-
-	if (width <= 40)
-		m_LineWidthSlider->value(m_width);
+	m_LineWidthSlider->value(m_width);
 }
 
 //------------------------------------------------
@@ -402,10 +412,11 @@ int ImpressionistUI::getAngle()
 //-------------------------------------------------
 void ImpressionistUI::setAngle(int angle)
 {
-	m_angle = angle;
+	while (angle >= 359) angle -= 360;
+	while (angle < 0) angle += 360;
 
-	if (angle <= 359)
-		m_LineAngleSlider->value(m_angle);
+	m_angle = angle;
+	m_LineAngleSlider->value(m_angle);
 }
 
 //------------------------------------------------
@@ -452,6 +463,14 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Scattered Circles",	FL_ALT+'d', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_SCATTERED_CIRCLES},
   {0}
 };
+
+Fl_Menu_Item ImpressionistUI::strokeDirectionTypeMenu[4] = {
+  {"Slider/Right Mouse", FL_ALT + 's', (Fl_Callback*)ImpressionistUI::cb_strokeDirectionChoice, (void*)0},
+  {"Gradient", FL_ALT + 'g', (Fl_Callback*)ImpressionistUI::cb_strokeDirectionChoice, (void*)1},
+  {"Brush Direction", FL_ALT + 'b', (Fl_Callback*)ImpressionistUI::cb_strokeDirectionChoice, (void*)2},
+  {0}
+};
+
 
 
 
@@ -502,6 +521,12 @@ ImpressionistUI::ImpressionistUI() {
 		m_ClearCanvasButton = new Fl_Button(240,10,150,25,"&Clear Canvas");
 		m_ClearCanvasButton->user_data((void*)(this));
 		m_ClearCanvasButton->callback(cb_clear_canvas_button);
+
+		m_strokeDirectionChoice = new Fl_Choice(117, 45, 150, 25, "&Stroke Direction");
+		m_strokeDirectionChoice->user_data((void*)(this));	// record self to be used by static callback functions
+		m_strokeDirectionChoice->menu(strokeDirectionTypeMenu);
+		m_strokeDirectionChoice->callback(cb_strokeDirectionChoice);
+		m_strokeDirectionChoice->deactivate();
 
 
 		// Add brush size slider to the dialog 
