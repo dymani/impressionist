@@ -8,20 +8,21 @@
 const double PI = 3.14159265358;
 
 LineBrush::LineBrush(ImpressionistDoc* pDoc, char* name)
-	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::SLIDER), m_prevTarget(-1, 0) {
+	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::SLIDER) {
 }
 
 void LineBrush::BrushBegin(const Point source, const Point target) {
 	ImpressionistDoc* pDoc = GetDocument();
+
+	// save mouse location
+	m_prevTargets.clear();
+	m_prevTargets.push_back(target);
 
 	updateAttributes(source, target);
 		
 	// do not draw when using mouse direction
 	if (m_mode != Mode::MOVEMENT)
 		BrushMove(source, target);
-
-	// save mouse location
-	m_prevTarget = target;
 }
 
 void LineBrush::BrushMove(const Point source, const Point target) {
@@ -32,25 +33,27 @@ void LineBrush::BrushMove(const Point source, const Point target) {
 		return;
 	}
 
+	m_prevTargets.push_back(target);
+	while (m_prevTargets.size() > MOUSE_HISTORY_SIZE)
+		m_prevTargets.erase(m_prevTargets.begin());
+
 	// return if it is the first draw of the movement
-	if (m_mode == Mode::MOVEMENT && m_prevTarget.x == -1) {
-		m_prevTarget = target;
+	if (m_mode == Mode::MOVEMENT && m_prevTargets.size() < 3) {
+		m_prevTargets.push_back(target);
 		return;
 	}	
-
-	updateAttributes(source, target);;
+	
+	updateAttributes(source, target);
 
 	drawLine(source, target);
-
-	m_prevTarget = target;
 }
 
 void LineBrush::BrushEnd(const Point source, const Point target) {
-	m_prevTarget.x = -1;
+	m_prevTargets.clear();
 }
 
 inline GLubyte getLuma(const GLubyte color[]) {
-	return GLubyte((color[0] + color[0] + color[1] + color[1] + color[1] + color[2]) / 6);
+	return GLubyte(0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2]);
 }
 
 void LineBrush::updateAttributes(const Point source, const Point target) {
@@ -93,12 +96,37 @@ void LineBrush::updateAttributes(const Point source, const Point target) {
 			m_angle = int(atan2(sumX, sumY) / PI * 180);
 			break;
 		case Mode::MOVEMENT:
-			m_angle = int(atan2(m_prevTarget.y - target.y, m_prevTarget.x - target.x) / PI * 180);
+			if (m_prevTargets.size() <= 1)
+				break;
+			m_angle = angleRegression();
 			break;
 	}
 
-	m_width = pDoc->getWidth();
-	
+	m_width = pDoc->getWidth();	
+}
+
+int LineBrush::angleRegression() {
+	double xBar = 0, yBar = 0;
+	for (Point& p : m_prevTargets) {
+		xBar += p.x;
+		yBar += p.y;
+	}
+	xBar = xBar / m_prevTargets.size();
+	yBar = yBar / m_prevTargets.size();
+	double sXY = 0, sX2 = 0, sY2 = 0;
+	for (Point& p : m_prevTargets) {
+		sXY += (p.x - xBar) * (p.y - yBar);
+		sX2 += (p.x - xBar) * (p.x - xBar);
+		sY2 += (p.y - yBar) * (p.y - yBar);
+	}
+	if (sXY == 0 && sX2 == 0)
+		return 90;
+	else if (sXY == 0 && sY2 == 0)
+		return 0;
+	else if (sX2 < sY2)
+		return int(atan2(sY2, sXY) * 180 / PI);
+	else
+		return int(atan2(sXY, sX2) * 180 / PI);
 }
 
 
