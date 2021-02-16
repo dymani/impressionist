@@ -3,6 +3,8 @@
 
 #include "ImpBrush.h"
 
+#include <vector>
+
 class LineBrush : public ImpBrush {
 public:
 	enum class Mode { SLIDER, GRADIENT, MOVEMENT };
@@ -20,10 +22,12 @@ public:
 	}
 protected:
 	void updateAttributes(const Point source, const Point target);
+	int angleRegression();
 	void drawLine(const Point source, const Point target);
 	int m_size, m_width, m_angle;	
 	Mode m_mode;
-	Point m_prevTarget;
+	const int MOUSE_HISTORY_SIZE = 5;
+	std::vector<Point> m_prevTargets;
 	const int m_gaussian[9] = { 1, 2, 1, 2, 4, 2, 1, 2, 1 };
 	const int m_gaussian5[25] = { 1, 4, 7, 4, 1,
 								  4, 16, 26, 16, 4,
