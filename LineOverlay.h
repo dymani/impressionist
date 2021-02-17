@@ -7,12 +7,13 @@ class ImpressionistDoc;
 
 class LineOverlay {
 public:
-	LineOverlay(ImpressionistDoc* pDoc);
+	LineOverlay();
 	void setStart(const Point target);
 	void draw(const Point target);
 	void release(const Point target);
-private:
+
 	ImpressionistDoc* m_pDoc;
+private:
 	bool m_validBrush;
 	Point m_start;
 	int m_size, m_angle;

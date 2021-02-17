@@ -54,9 +54,7 @@ ImpressionistDoc::ImpressionistDoc()
 		= new ScatteredCircleBrush( this, "Scattered Circles" );
 
 	// make one of the brushes current
-	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];
-
-	m_lineOverlay = new LineOverlay(this);
+	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];	
 
 }
 

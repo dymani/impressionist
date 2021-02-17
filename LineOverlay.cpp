@@ -9,11 +9,12 @@
 
 const double PI = 3.14159;
 
-LineOverlay::LineOverlay(ImpressionistDoc* pDoc)
-	: m_pDoc(pDoc), m_size(1), m_angle(0), m_validBrush(false) {
+LineOverlay::LineOverlay()
+	: m_size(1), m_angle(0), m_validBrush(false) {
 }
 
 void LineOverlay::setStart(const Point target) {
+	if (!m_pDoc) return;
 	m_validBrush = false;
 
 	if (dynamic_cast<LineBrush*>(m_pDoc->m_pCurrentBrush)
@@ -26,6 +27,7 @@ void LineOverlay::setStart(const Point target) {
 }
 
 void LineOverlay::draw(const Point target) {
+	if (!m_pDoc) return;
 	if (!m_validBrush) return;
 	
 	int dx = target.x - m_start.x;
@@ -42,6 +44,7 @@ void LineOverlay::draw(const Point target) {
 }
 
 void LineOverlay::release(const Point target) {
+	if (!m_pDoc) return;
 	if (!m_validBrush) return;
 	
 	m_pDoc->setSize(m_size);

@@ -359,6 +359,9 @@ void ImpressionistUI::setDocument(ImpressionistDoc* doc)
 
 	m_origView->m_pDoc = doc;
 	m_paintView->m_pDoc = doc;
+
+	m_lineOverlay->m_pDoc = doc;
+	m_marker->m_pDoc = doc;
 }
 
 //------------------------------------------------
@@ -584,5 +587,8 @@ ImpressionistUI::ImpressionistUI() {
 		m_AlphaSlider->callback(cb_alphaSlides);
 
     m_brushDialog->end();	
+
+	m_lineOverlay = new LineOverlay();
+	m_marker = new Marker();
 
 }
