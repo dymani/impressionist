@@ -32,6 +32,8 @@ public:
 
 	ImpressionistDoc*	m_pDoc;
 
+	bool m_isMarkerVisible;
+
 private:
 	int	m_nWindowWidth, 
 		m_nWindowHeight;

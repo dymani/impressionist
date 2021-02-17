@@ -19,6 +19,8 @@
 #include "Impressionist.h"
 #include "OriginalView.h"
 #include "PaintView.h"
+#include "LineOverlay.h"
+#include "Marker.h"
 
 #include "ImpBrush.h"
 
@@ -32,6 +34,9 @@ public:
 								
 	PaintView*			m_paintView;
 	OriginalView*		m_origView;
+
+	LineOverlay* m_lineOverlay;
+	Marker* m_marker;
 
 // for brush dialog
 	Fl_Window*			m_brushDialog;

@@ -153,6 +153,7 @@
     <ClCompile Include="ScatteredCircleBrush.cpp" />
     <ClCompile Include="ScatteredLineBrush.cpp" />
     <ClCompile Include="ScatteredPointBrush.cpp" />
+    <ClCompile Include="Marker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
@@ -163,6 +164,7 @@
     <ClInclude Include="ImpressionistUI.h" />
     <ClInclude Include="LineBrush.h" />
     <ClInclude Include="LineOverlay.h" />
+    <ClInclude Include="Marker.h" />
     <ClInclude Include="OriginalView.h" />
     <ClInclude Include="PaintView.h" />
     <ClInclude Include="PointBrush.h" />

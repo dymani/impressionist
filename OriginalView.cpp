@@ -6,6 +6,7 @@
 
 #include "impressionist.h"
 #include "impressionistDoc.h"
+#include "impressionistUI.h"
 #include "originalview.h"
 
 #ifndef WIN32
@@ -21,6 +22,7 @@ OriginalView::OriginalView(int			x,
 {
 	m_nWindowWidth	= w;
 	m_nWindowHeight	= h;
+	m_isMarkerVisible = false;
 
 }
 
@@ -74,6 +76,9 @@ void OriginalView::draw()
 		glPixelStorei( GL_UNPACK_ROW_LENGTH, m_pDoc->m_nWidth );
 		glDrawBuffer( GL_BACK );
 		glDrawPixels( drawWidth, drawHeight, GL_RGB, GL_UNSIGNED_BYTE, bitstart );
+
+		if (m_isMarkerVisible)
+			m_pDoc->m_pUI->m_marker->draw(m_nWindowHeight - drawHeight);
 
 	}
 			
