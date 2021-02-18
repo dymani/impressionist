@@ -12,6 +12,8 @@
 
 class ImpressionistUI;
 
+class Convolution;
+
 class ImpressionistDoc 
 {
 public:
@@ -25,6 +27,7 @@ public:
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
 	int swapContents();
 	int changeImage(char* name);
+	int applyFilter(int filterType, bool isNormalized);
 
 	void	setBrushType(int type);			// called by the UI to set the brushType
 	void    setStrokeDirectionType(int type); // called by the UI to set the stroke direction type
@@ -58,7 +61,9 @@ public:
 	int m_nSize;	
 	int m_width;
 	int m_angle;
-	int m_alpha;				
+	int m_alpha;			
+
+	Convolution* m_convolutions[2];
 
 	ImpressionistUI*	m_pUI;
 

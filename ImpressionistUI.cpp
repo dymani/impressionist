@@ -256,6 +256,12 @@ void ImpressionistUI::cb_about(Fl_Menu_* o, void* v)
 	fl_message("Impressionist FLTK version for CS341, Spring 2002");
 }
 
+
+void ImpressionistUI::cb_filters(Fl_Menu_* o, void* v) {
+	whoami(o)->m_filterDialog->show();
+}
+
+
 //------- UI should keep track of the current for all the controls for answering the query from Doc ---------
 //-------------------------------------------------------------
 // Sets the type of brush to use to the one chosen in the brush 
@@ -335,6 +341,28 @@ void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
 	int convert = (int)(((Fl_Slider*)o)->value() * 255);
 	((ImpressionistUI*)(o->user_data()))->m_alpha = int(convert);
 }
+
+//---------------------------------- filter dialog functions --------------------------------------
+
+void ImpressionistUI::cb_filter_type_choice(Fl_Widget* o, void* v) {
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+
+	pUI->m_filterType = (int)v;
+}
+
+void ImpressionistUI::cb_filter_normalize_light_button(Fl_Widget* o, void* v) {
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	pUI->m_isFilterNormalized = !pUI->m_isFilterNormalized;
+}
+
+void ImpressionistUI::cb_filter_apply_button(Fl_Widget* o, void* v) {
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+	
+	pDoc->applyFilter(pUI->m_filterType, pUI->m_isFilterNormalized);
+}
+
 
 //---------------------------------- per instance functions --------------------------------------
 
@@ -462,7 +490,8 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_clear_canvas },
 		{ "S&wap contents", FL_ALT + 'w', (Fl_Callback *)ImpressionistUI::cb_swap_contents,},
 		{ "Change &mural image", FL_ALT + 'm', (Fl_Callback*)ImpressionistUI::cb_change_image, 0, FL_MENU_DIVIDER },
-		
+		{ "&Filters...", FL_ALT + 'f', (Fl_Callback*)ImpressionistUI::cb_filters, 0, FL_MENU_DIVIDER },
+
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
 		{ 0 },
 
@@ -488,6 +517,12 @@ Fl_Menu_Item ImpressionistUI::strokeDirectionTypeMenu[4] = {
   {"Slider/Right Mouse", FL_ALT + 's', (Fl_Callback*)ImpressionistUI::cb_strokeDirectionChoice, (void*)0},
   {"Gradient", FL_ALT + 'g', (Fl_Callback*)ImpressionistUI::cb_strokeDirectionChoice, (void*)1},
   {"Brush Direction", FL_ALT + 'b', (Fl_Callback*)ImpressionistUI::cb_strokeDirectionChoice, (void*)2},
+  {0}
+};
+
+Fl_Menu_Item ImpressionistUI::filterTypeMenu[FilterTypes::NUM_FILTER_TYPE + 1] = {
+  {"Gaussian 3x3", FL_ALT + 'g', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::GAUSSIAN_3},
+  {"Gaussian 5x5",	FL_ALT + 'h', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::GAUSSIAN_5},
   {0}
 };
 
@@ -604,6 +639,29 @@ ImpressionistUI::ImpressionistUI() {
 		m_AlphaSlider->callback(cb_alphaSlides);
 
     m_brushDialog->end();	
+
+	m_filterType = 0;
+	m_isFilterNormalized = true;
+
+
+	m_filterDialog = new Fl_Window(400, 325, "Filter Dialog");
+		// Add a brush type choice to the dialog
+		m_filterTypeChoice = new Fl_Choice(50, 10, 150, 25, "&Filter");
+		m_filterTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
+		m_filterTypeChoice->menu(filterTypeMenu);
+		m_filterTypeChoice->callback(cb_filter_type_choice);
+
+		m_filterNormalizeLightButton = new Fl_Light_Button(50, 45, 150, 25, "&Normalized");
+		m_filterNormalizeLightButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_filterNormalizeLightButton->value(1);
+		m_filterNormalizeLightButton->callback(cb_filter_normalize_light_button);
+
+		m_filterApplyButton = new Fl_Button(240, 80, 150, 25, "&Apply");
+		m_filterApplyButton->user_data((void*)(this));
+		m_filterApplyButton->callback(cb_filter_apply_button);
+
+	m_filterDialog->end();
+
 
 	m_lineOverlay = new LineOverlay();
 	m_marker = new Marker();

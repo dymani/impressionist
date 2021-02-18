@@ -21,6 +21,7 @@
 #include "PaintView.h"
 #include "LineOverlay.h"
 #include "Marker.h"
+#include "Convolution.h"
 
 #include "ImpBrush.h"
 
@@ -50,6 +51,12 @@ public:
 
 	Fl_Button*          m_ClearCanvasButton;
 
+// for filter dialog
+	Fl_Window* m_filterDialog;
+	Fl_Choice* m_filterTypeChoice;
+	Fl_Light_Button* m_filterNormalizeLightButton;
+	Fl_Button* m_filterApplyButton;
+
 	// Member functions
 	void				setDocument(ImpressionistDoc* doc);
 	ImpressionistDoc*	getDocument();
@@ -77,10 +84,14 @@ private:
 	int		m_angle;
 	int		m_alpha;
 
+	int m_filterType;
+	bool m_isFilterNormalized;
+
 	// Static class members
 	static Fl_Menu_Item		menuitems[];
 	static Fl_Menu_Item		brushTypeMenu[NUM_BRUSH_TYPE+1];
 	static Fl_Menu_Item		strokeDirectionTypeMenu[4];
+	static Fl_Menu_Item		filterTypeMenu[FilterTypes::NUM_FILTER_TYPE + 1];
 
 	static ImpressionistUI*	whoami(Fl_Menu_* o);
 
@@ -94,6 +105,8 @@ private:
 	static void cb_change_image(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
+	static void	cb_filters(Fl_Menu_* o, void* v);
+
 	static void	cb_brushChoice(Fl_Widget* o, void* v);
 	static void	cb_clear_canvas_button(Fl_Widget* o, void* v);
 	static void	cb_strokeDirectionChoice(Fl_Widget* o, void* v);
@@ -101,6 +114,10 @@ private:
 	static void cb_widthSlides(Fl_Widget* o, void* v);
 	static void cb_angleSlides(Fl_Widget* o, void* v);
 	static void cb_alphaSlides(Fl_Widget* o, void* v);
+
+	static void cb_filter_type_choice(Fl_Widget* o, void* v);
+	static void cb_filter_normalize_light_button(Fl_Widget* o, void* v);
+	static void cb_filter_apply_button(Fl_Widget* o, void* v);
 
 };
 

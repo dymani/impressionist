@@ -9,15 +9,7 @@ Convolution::Convolution(const int kernel[], int kWidth, int kHeight, bool isNor
 		m_kernel[i] = kernel[i];
 	}
 	
-	if (isNormalized) {
-		m_normalizeFactor = 0;
-		for (int i = 0; i < m_kWidth * m_kHeight; ++i)
-			m_normalizeFactor += m_kernel[i];
-		m_normalizeFactor = 1 / m_normalizeFactor;
-	}
-	else {
-		m_normalizeFactor = 1;
-	}
+	setNormalized(isNormalized);
 
 	m_image = nullptr;
 	m_iWidth = m_iHeight = 0;
@@ -31,7 +23,7 @@ Convolution::~Convolution() {
 	if (m_convolution) delete[] m_convolution;
 }
 
-void Convolution::changeImage(const unsigned char* image, int iWidth, int iHeight, bool isRgb) {
+void Convolution::setImage(const unsigned char* image, int iWidth, int iHeight, bool isRgb) {
 	if (m_image) {
 		if (m_iWidth * m_iHeight != iWidth * iHeight) {
 			m_iWidth = iWidth;
@@ -58,6 +50,18 @@ void Convolution::changeImage(const unsigned char* image, int iWidth, int iHeigh
 		for (int i = 0; i < m_iWidth * m_iHeight; ++i) {
 			m_image[i] = image[i];
 		}
+	}
+}
+
+void Convolution::setNormalized(bool isNormalized) {
+	if (isNormalized) {
+		m_normalizeFactor = 0;
+		for (int i = 0; i < m_kWidth * m_kHeight; ++i)
+			m_normalizeFactor += m_kernel[i];
+		m_normalizeFactor = 1 / m_normalizeFactor;
+	}
+	else {
+		m_normalizeFactor = 1;
 	}
 }
 
@@ -118,9 +122,13 @@ unsigned char* Convolution::generateResultImage() {
 		return nullptr;
 	compute();
 	unsigned char* result = new unsigned char[m_iWidth * m_iHeight];
+	double r;
 	for (int row = 0; row < m_iHeight; ++row) {
 		for (int col = 0; col < m_iWidth; ++col) {
-			result[row * m_iWidth + col] = (unsigned char)m_convolution[row * m_iWidth + col];
+			r = m_convolution[row * m_iWidth + col];
+			r = r < 0 ? 0 : r;
+			r = r > 255 ? 255 : r;
+			result[row * m_iWidth + col] = (unsigned char)r;
 		}
 	}
 	return result;
