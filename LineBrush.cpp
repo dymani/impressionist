@@ -9,6 +9,10 @@ const double PI = 3.14159265358;
 
 LineBrush::LineBrush(ImpressionistDoc* pDoc, char* name)
 	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::SLIDER) {
+	m_gaussian = new Convolution(GAUSSIAN_5, 5, 5, true);
+	m_sobelX = new Convolution(SOBEL_X, 3, 3, false);
+	m_sobelY = new Convolution(SOBEL_Y, 3, 3, false);
+	m_currentImage = nullptr;
 }
 
 void LineBrush::BrushBegin(const Point source, const Point target) {
@@ -17,6 +21,17 @@ void LineBrush::BrushBegin(const Point source, const Point target) {
 	// save mouse location
 	m_prevTargets.clear();
 	m_prevTargets.push_back(target);
+		
+	if (m_mode == Mode::GRADIENT) {
+		if (m_currentImage != pDoc->m_ucBitmap) {
+			m_currentImage = pDoc->m_ucBitmap;
+			m_gaussian->changeImage(pDoc->m_ucBitmap, pDoc->m_nPaintWidth, pDoc->m_nPaintHeight, true);
+			unsigned char* result = m_gaussian->generateResultImage();
+			m_sobelX->changeImage(result, pDoc->m_nPaintWidth, pDoc->m_nPaintHeight, false);
+			m_sobelY->changeImage(result, pDoc->m_nPaintWidth, pDoc->m_nPaintHeight, false);
+			delete[] result;
+		}
+	}
 
 	updateAttributes(source, target);
 		
@@ -61,39 +76,12 @@ void LineBrush::updateAttributes(const Point source, const Point target) {
 
 	m_size = pDoc->getSize();
 
-	GLubyte color[3];
-	int sumX = 0, sumY = 0;
 	switch (m_mode) {
 		case Mode::SLIDER:
 			m_angle = pDoc->getAngle();
 			break;
 		case Mode::GRADIENT:
-			for (int i = 0; i < 3; ++i) {
-				for (int j = 0, luma; j < 3; ++j) {					
-					luma = 0;
-					// gaussian 3x3 kernel
-					/*for (int y = 0; y < 3; ++y) {
-						for (int x = 0; x < 3; ++x) {
-							memcpy(color, pDoc->GetOriginalPixel(source.x - 2 + j + x, source.y - 2 + i + y), 3);
-							luma += getLuma(color) * m_gaussian[y * 3 + x];
-						}
-					}
-					sumX += luma * m_sobelX[i * 3 + j] / 16;
-					sumY += luma * m_sobelY[i * 3 + j] / 16;*/	
-
-					// gaussian 5x5 kernel
-					for (int y = 0; y < 5; ++y) {
-						for (int x = 0; x < 5; ++x) {
-							memcpy(color, pDoc->GetOriginalPixel(source.x - 3 + j + x, source.y - 3 + i + y), 3);
-							luma += getLuma(color) * m_gaussian5[y * 5 + x];
-						}
-					}
-					sumX += luma * m_sobelX[i * 3 + j] / 273;
-					sumY += luma * m_sobelY[i * 3 + j] / 273;
-				}
-			}			
-
-			m_angle = int(atan2(sumX, sumY) / PI * 180);
+			m_angle = int(atan2(m_sobelX->getPixelResult(target.x, target.y), m_sobelY->getPixelResult(target.x, target.y)) / PI * 180);
 			break;
 		case Mode::MOVEMENT:
 			if (m_prevTargets.size() <= 1)

@@ -240,6 +240,42 @@ int ImpressionistDoc::clearCanvas()
 	return 0;
 }
 
+int ImpressionistDoc::swapContents() {
+	unsigned char* temp = m_ucPainting;
+	m_ucPainting = m_ucBitmap;
+	m_ucBitmap = temp;
+	m_pUI->m_origView->refresh();
+	m_pUI->m_paintView->refresh();
+	return 1;
+}
+
+int ImpressionistDoc::changeImage(char* iname) {
+	// try to open the image to read
+	unsigned char* data;
+	int width,height;
+
+	if ((data = readBMP(iname, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	if (m_nWidth != width || m_nHeight != height) {
+		fl_alert("Mural image should have the same dimension");
+		return 0;
+	}
+
+	// release old storage
+	if (m_ucBitmap) delete[] m_ucBitmap;
+	m_ucBitmap = data;
+
+	// display it on origView
+	m_pUI->m_origView->resizeWindow(width, height);
+	m_pUI->m_origView->refresh();
+
+	return 1;
+}
+
 //------------------------------------------------------------------
 // Get the color of the pixel in the original image at coord x and y
 //------------------------------------------------------------------

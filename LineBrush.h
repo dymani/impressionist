@@ -2,6 +2,7 @@
 #define LINE_BRUSH_H
 
 #include "ImpBrush.h"
+#include "Convolution.h"
 
 #include <vector>
 
@@ -28,14 +29,16 @@ protected:
 	Mode m_mode;
 	const int MOUSE_HISTORY_SIZE = 5;
 	std::vector<Point> m_prevTargets;
-	const int m_gaussian[9] = { 1, 2, 1, 2, 4, 2, 1, 2, 1 };
-	const int m_gaussian5[25] = { 1, 4, 7, 4, 1,
+	const int GAUSSIAN_3[9] = { 1, 2, 1, 2, 4, 2, 1, 2, 1 };
+	const int GAUSSIAN_5[25] = { 1, 4, 7, 4, 1,
 								  4, 16, 26, 16, 4,
 		                          7, 26, 41, 26, 7,
 								  4, 16, 26, 16, 4,
 								  1, 4, 7, 4, 1 };
-	const int m_sobelX[9] = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
-	const int m_sobelY[9] = { 1, 2, 1, 0, 0, 0, -1, -2, -1 };
+	const int SOBEL_X[9] = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
+	const int SOBEL_Y[9] = { 1, 2, 1, 0, 0, 0, -1, -2, -1 };
+	Convolution* m_gaussian, *m_sobelX, *m_sobelY;
+	unsigned char* m_currentImage;
 };
 
 #endif
