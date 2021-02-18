@@ -21,6 +21,9 @@
 #include "ScatteredLineBrush.h"
 
 #include "LineOverlay.h"
+#include "Convolution.h"
+
+#include <vector>
 
 
 #define DESTROY(p)	{  if ((p)!=NULL) {delete [] p; p=NULL; } }
@@ -56,6 +59,8 @@ ImpressionistDoc::ImpressionistDoc()
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];	
 
+	m_convolutions[0] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_3, 3, 3, true);
+	m_convolutions[1] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_5, 5, 5, true);
 }
 
 
@@ -273,6 +278,24 @@ int ImpressionistDoc::changeImage(char* iname) {
 	m_pUI->m_origView->resizeWindow(width, height);
 	m_pUI->m_origView->refresh();
 
+	return 1;
+}
+
+int ImpressionistDoc::applyFilter(int filterType, bool isNormalized) {
+	if (!m_ucBitmap)
+		return 0;
+	m_convolutions[filterType]->setNormalized(isNormalized);
+	m_convolutions[filterType]->setImage(m_ucBitmap, m_nPaintWidth, m_nHeight, true);
+	unsigned char* result = m_convolutions[filterType]->generateResultImage();
+	if (m_ucPainting) {
+		for (int i = 0; i < m_nPaintWidth * m_nPaintHeight; ++i) {
+			m_ucPainting[i * 3] = result[i];
+			m_ucPainting[i * 3 + 1] = result[i];
+			m_ucPainting[i * 3 + 2] = result[i];
+		}
+		m_pUI->m_paintView->refresh();
+	}
+	delete[] result;
 	return 1;
 }
 
