@@ -16,6 +16,7 @@
     <ClCompile Include="ScatteredPointBrush.cpp" />
     <ClCompile Include="LineOverlay.cpp" />
     <ClCompile Include="Marker.cpp" />
+    <ClCompile Include="Convolution.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
@@ -33,5 +34,6 @@
     <ClInclude Include="ImpressionistUI.h" />
     <ClInclude Include="Impressionist.h" />
     <ClInclude Include="Marker.h" />
+    <ClInclude Include="Convolution.h" />
   </ItemGroup>
 </Project>
