@@ -19,6 +19,7 @@
 #include "ScatteredPointBrush.h"
 #include "ScatteredCircleBrush.h"
 #include "ScatteredLineBrush.h"
+#include "RandomPolygonBrush.h"
 
 #include "LineOverlay.h"
 #include "Convolution.h"
@@ -55,6 +56,10 @@ ImpressionistDoc::ImpressionistDoc()
 		= new ScatteredLineBrush( this, "Scattered Lines" );
 	ImpBrush::c_pBrushes[BRUSH_SCATTERED_CIRCLES]	
 		= new ScatteredCircleBrush( this, "Scattered Circles" );
+
+	// New brush(es)
+	ImpBrush::c_pBrushes[BRUSH_RANDOM_POLYGON]
+		= new RandomPolygonBrush(this, "Random Polygon");
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];	

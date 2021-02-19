@@ -1,7 +1,7 @@
 //
-// CircleBrush.h
+// ScatteredCircleBrush.h
 //
-// The header file for Circle Brush. 
+// The header file for Scattered Circle Brush. 
 //
 
 #ifndef SCATTEREDCIRCLEBRUSH_H
