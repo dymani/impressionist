@@ -155,6 +155,7 @@
     <ClCompile Include="ScatteredLineBrush.cpp" />
     <ClCompile Include="ScatteredPointBrush.cpp" />
     <ClCompile Include="Marker.cpp" />
+    <ClCompile Include="InputTable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Impressionist.h" />
     <ClInclude Include="ImpressionistDoc.h" />
     <ClInclude Include="ImpressionistUI.h" />
+    <ClInclude Include="InputTable.h" />
     <ClInclude Include="LineBrush.h" />
     <ClInclude Include="LineOverlay.h" />
     <ClInclude Include="Marker.h" />

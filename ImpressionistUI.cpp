@@ -8,6 +8,7 @@
 #include <FL/fl_ask.h>
 
 #include <math.h>
+#include <string>
 
 #include "impressionistUI.h"
 #include "impressionistDoc.h"
@@ -347,8 +348,21 @@ void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
 void ImpressionistUI::cb_filter_type_choice(Fl_Widget* o, void* v) {
 	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
 	ImpressionistDoc* pDoc = pUI->getDocument();
-
 	pUI->m_filterType = (int)v;
+	if (pUI->m_filterType == 4) {
+		pUI->m_filterInputTable->rows(pUI->m_filterHeight);
+		pUI->m_filterInputTable->cols(pUI->m_filterWidth);
+		pUI->m_filterInputTable->activate();
+		pUI->m_filterWidthInput->activate();
+		pUI->m_filterHeightInput->activate();
+	}
+	else {
+		pUI->m_filterInputTable->rows(0);
+		pUI->m_filterInputTable->cols(0);
+		pUI->m_filterInputTable->deactivate();
+		pUI->m_filterWidthInput->deactivate();
+		pUI->m_filterHeightInput->deactivate();
+	}
 }
 
 void ImpressionistUI::cb_filter_source_choice(Fl_Widget* o, void* v) {
@@ -356,6 +370,20 @@ void ImpressionistUI::cb_filter_source_choice(Fl_Widget* o, void* v) {
 	ImpressionistDoc* pDoc = pUI->getDocument();
 
 	pUI->m_filterSource = (int)v;
+}
+
+void ImpressionistUI::cb_filter_width_input(Fl_Widget* o, void* v) {
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	pUI->m_filterWidth = atoi(((Fl_Int_Input*)o)->value());
+	pUI->m_filterInputTable->rows(pUI->m_filterHeight);
+	pUI->m_filterInputTable->cols(pUI->m_filterWidth);
+}
+
+void ImpressionistUI::cb_filter_height_input(Fl_Widget* o, void* v) {
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	pUI->m_filterHeight = atoi(((Fl_Int_Input*)o)->value());
+	pUI->m_filterInputTable->rows(pUI->m_filterHeight);
+	pUI->m_filterInputTable->cols(pUI->m_filterWidth);
 }
 
 void ImpressionistUI::cb_filter_normalize_light_button(Fl_Widget* o, void* v) {
@@ -366,8 +394,15 @@ void ImpressionistUI::cb_filter_normalize_light_button(Fl_Widget* o, void* v) {
 void ImpressionistUI::cb_filter_apply_button(Fl_Widget* o, void* v) {
 	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
 	ImpressionistDoc* pDoc = pUI->getDocument();
-	
-	pDoc->applyFilter(pUI->m_filterType, pUI->m_filterSource, pUI->m_isFilterNormalized);
+	if (pUI->m_filterType == 4) {
+		if(pUI->m_filterWidth % 2 == 0 || pUI->m_filterHeight % 2 == 0)
+			fl_alert("Dimension of kernel must be odd!");
+		else
+			pDoc->applyCustomFilter(*pUI->m_filterInputTable->m_values, pUI->m_filterWidth, pUI->m_filterHeight, pUI->m_filterSource, pUI->m_isFilterNormalized);
+	}
+	else {
+		pDoc->applyFilter(pUI->m_filterType, pUI->m_filterSource, pUI->m_isFilterNormalized);
+	}
 }
 
 
@@ -532,7 +567,7 @@ Fl_Menu_Item ImpressionistUI::filterTypeMenu[FilterTypes::NUM_FILTER_TYPE + 1] =
   {"Gaussian 5x5", FL_ALT + 'h', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::GAUSSIAN_5},
   {"Sobel X", FL_ALT + 'x', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::SOBEL_X},
   {"Sobel Y", FL_ALT + 'y', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::SOBEL_Y},
-  {"Gaussian 5x5", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::CUSTOM},
+  {"Custom...", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::CUSTOM},
   {0}
 };
 
@@ -656,27 +691,59 @@ ImpressionistUI::ImpressionistUI() {
 
 	m_filterType = 0;
 	m_filterSource = 0;
+	m_filterWidth = 3;
+	m_filterHeight = 3;
 	m_isFilterNormalized = true;
 
 
-	m_filterDialog = new Fl_Window(400, 325, "Filter Dialog");
-		// Add a brush type choice to the dialog
-		m_filterTypeChoice = new Fl_Choice(50, 10, 150, 25, "&Filter");
+	m_filterDialog = new Fl_Double_Window(400, 400, "Filter Dialog");
+		m_filterSourceChoice = new Fl_Choice(50, 10, 150, 25, "&Source");
+		m_filterSourceChoice->user_data((void*)(this));	// record self to be used by static callback functions
+		m_filterSourceChoice->menu(filterSourceMenu);
+		m_filterSourceChoice->callback(cb_filter_source_choice);
+			
+		m_filterTypeChoice = new Fl_Choice(50, 45, 150, 25, "&Filter");
 		m_filterTypeChoice->user_data((void*)(this));	// record self to be used by static callback functions
 		m_filterTypeChoice->menu(filterTypeMenu);
 		m_filterTypeChoice->callback(cb_filter_type_choice);
 
-		m_filterSourceChoice= new Fl_Choice(50, 45, 150, 25, "&Source");
-		m_filterSourceChoice->user_data((void*)(this));	// record self to be used by static callback functions
-		m_filterSourceChoice->menu(filterSourceMenu);
-		m_filterSourceChoice->callback(cb_filter_source_choice);
+		m_filterWidthInput = new Fl_Int_Input(100, 80, 80, 25, "&Width (max 9)");
+		m_filterWidthInput->user_data((void*)(this));   // record self to be used by static callback functions
+		m_filterWidthInput->callback(cb_filter_width_input);
+		m_filterWidthInput->value(std::to_string(m_filterWidth).c_str());
+		m_filterWidthInput->deactivate();
 
-		m_filterNormalizeLightButton = new Fl_Light_Button(50, 80, 150, 25, "&Normalized");
+		m_filterHeightInput = new Fl_Int_Input(300, 80, 80, 25, "&Height (max 9)");
+		m_filterHeightInput->user_data((void*)(this));   // record self to be used by static callback functions
+		m_filterHeightInput->callback(cb_filter_height_input);
+		m_filterHeightInput->value(std::to_string(m_filterHeight).c_str());
+		m_filterHeightInput->deactivate();
+
+		m_filterInputTable = new InputTable(50, 140, 300, 170, "Kernel");
+#if FLTK_ABI_VERSION >= 10303
+		m_filterInputTable->tab_cell_nav(1);		// enable tab navigation of table cells (instead of fltk widgets)
+#endif
+		m_filterInputTable->tooltip("Use keyboard to navigate cells:\n"
+			"Arrow keys or Tab/Shift-Tab");
+		m_filterInputTable->row_header(1);
+		m_filterInputTable->row_header_width(25);
+		m_filterInputTable->row_resize(0);
+		m_filterInputTable->rows(0);
+		m_filterInputTable->row_height_all(25);
+		m_filterInputTable->col_header(1);
+		m_filterInputTable->col_header_height(25);
+		m_filterInputTable->col_resize(0);
+		m_filterInputTable->cols(0);
+		m_filterInputTable->col_width_all(50);
+		m_filterInputTable->deactivate();
+		m_filterInputTable->m_values[1][1] = 1;
+
+		m_filterNormalizeLightButton = new Fl_Light_Button(50, 320, 150, 25, "&Normalized");
 		m_filterNormalizeLightButton->user_data((void*)(this));   // record self to be used by static callback functions
 		m_filterNormalizeLightButton->value(1);
 		m_filterNormalizeLightButton->callback(cb_filter_normalize_light_button);
 
-		m_filterApplyButton = new Fl_Button(240, 115, 150, 25, "&Apply");
+		m_filterApplyButton = new Fl_Button(220, 355, 150, 25, "&Apply");
 		m_filterApplyButton->user_data((void*)(this));
 		m_filterApplyButton->callback(cb_filter_apply_button);
 

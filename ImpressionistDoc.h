@@ -27,6 +27,7 @@ public:
 	int swapContents();
 	int changeImage(char* name);
 	int applyFilter(int filterType, int filterSource, bool isNormalized);
+	int applyCustomFilter(int kernel[], int width, int height, int filterSource, bool isNormalized);
 
 	void	setBrushType(int type);			// called by the UI to set the brushType
 	void    setStrokeDirectionType(int type); // called by the UI to set the stroke direction type

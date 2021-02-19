@@ -22,6 +22,7 @@
 
 #include "LineOverlay.h"
 #include "Convolution.h"
+#include "InputTable.h"
 
 #include <vector>
 
@@ -287,8 +288,6 @@ int ImpressionistDoc::changeImage(char* iname) {
 int ImpressionistDoc::applyFilter(int filterType, int filterSource, bool isNormalized) {
 	if (!m_ucBitmap)
 		return 0;
-	if (filterType == 4) // TODO: custom kernel
-		return 1;
 	m_convolutions[filterType]->setNormalized(isNormalized);
 	if (filterSource == 0) {
 		m_convolutions[filterType]->setImage(m_ucBitmap, m_nPaintWidth, m_nHeight, true);
@@ -306,6 +305,22 @@ int ImpressionistDoc::applyFilter(int filterType, int filterSource, bool isNorma
 	m_pUI->m_paintView->refresh();
 	delete[] result;
 	return 1;
+}
+
+int ImpressionistDoc::applyCustomFilter(int kernel[], int width, int height, int filterSoruce, bool isNormalized) {
+	if (!m_ucBitmap)
+		return 0;
+	if (m_convolutions[4])
+		delete m_convolutions[4];
+	int* kern = new int[width * height];
+	for (int r = 0; r < height; ++r) {
+		for (int c = 0; c < width; ++c) {
+			kern[r * width + c] = kernel[r * InputTable::MAX_COLS + c];
+		}
+	}
+	m_convolutions[4] = new Convolution(kern, width, height, isNormalized);
+	delete[] kern;
+	applyFilter(4, filterSoruce, isNormalized);
 }
 
 //------------------------------------------------------------------
