@@ -65,10 +65,22 @@ ImpressionistDoc::ImpressionistDoc()
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];	
 
-	m_convolutions[0] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_3, 3, 3, true);
-	m_convolutions[1] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_5, 5, 5, true);
-	m_convolutions[2] = new Convolution(FilterTypes::KERNEL_SOBEL_X, 3, 3, true);
-	m_convolutions[3] = new Convolution(FilterTypes::KERNEL_SOBEL_Y, 3, 3, true);
+	m_convolutions[0] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_3, 3, 3);
+	m_convolutions[0]->setRgbOutput(true);
+	m_convolutions[0]->setValueFunction(Convolution::LUMA);
+
+	m_convolutions[1] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_5, 5, 5);
+	m_convolutions[1]->setRgbOutput(true);
+	m_convolutions[1]->setValueFunction(Convolution::RED);
+
+	m_convolutions[2] = new Convolution(FilterTypes::KERNEL_SOBEL_X, 3, 3);
+	m_convolutions[2]->setRgbOutput(true);
+	m_convolutions[2]->setValueFunction(Convolution::GREEN);
+
+	m_convolutions[3] = new Convolution(FilterTypes::KERNEL_SOBEL_Y, 3, 3);
+	m_convolutions[3]->setRgbOutput(true);
+	m_convolutions[3]->setValueFunction(Convolution::BLUE);
+
 	m_convolutions[4] = nullptr;
 }
 
@@ -301,11 +313,9 @@ int ImpressionistDoc::applyFilter(int filterType, int filterSource, bool isNorma
 		m_convolutions[filterType]->setImage(m_ucPainting, m_nPaintWidth, m_nHeight, true);
 	}
 	
-	unsigned char* result = m_convolutions[filterType]->generateResultImage();
-	for (int i = 0; i < m_nPaintWidth * m_nPaintHeight; ++i) {
-		m_ucPainting[i * 3] = result[i];
-		m_ucPainting[i * 3 + 1] = result[i];
-		m_ucPainting[i * 3 + 2] = result[i];
+	unsigned char* result = m_convolutions[filterType]->generateImage();
+	for (int i = 0; i < m_nPaintWidth * m_nPaintHeight * 3; ++i) {
+		m_ucPainting[i] = result[i];
 	}
 	m_pUI->m_paintView->refresh();
 	delete[] result;
@@ -323,7 +333,9 @@ int ImpressionistDoc::applyCustomFilter(int kernel[], int width, int height, int
 			kern[r * width + c] = kernel[r * InputTable::MAX_COLS + c];
 		}
 	}
-	m_convolutions[4] = new Convolution(kern, width, height, isNormalized);
+	m_convolutions[4] = new Convolution(kern, width, height);
+	m_convolutions[4]->setRgbOutput(true);
+	m_convolutions[4]->setValueFunction(Convolution::RGB);
 	delete[] kern;
 	applyFilter(4, filterSoruce, isNormalized);
 }
