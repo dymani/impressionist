@@ -15,6 +15,7 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Light_Button.H>
+#include "InputTable.h"
 
 #include "Impressionist.h"
 #include "OriginalView.h"
@@ -53,7 +54,11 @@ public:
 
 // for filter dialog
 	Fl_Window* m_filterDialog;
+	Fl_Choice* m_filterSourceChoice;
 	Fl_Choice* m_filterTypeChoice;
+	Fl_Int_Input* m_filterWidthInput;
+	Fl_Int_Input* m_filterHeightInput;
+	InputTable* m_filterInputTable;
 	Fl_Light_Button* m_filterNormalizeLightButton;
 	Fl_Button* m_filterApplyButton;
 
@@ -85,6 +90,9 @@ private:
 	int		m_alpha;
 
 	int m_filterType;
+	int m_filterSource;
+	int m_filterWidth;
+	int m_filterHeight;
 	bool m_isFilterNormalized;
 
 	// Static class members
@@ -92,6 +100,7 @@ private:
 	static Fl_Menu_Item		brushTypeMenu[NUM_BRUSH_TYPE+1];
 	static Fl_Menu_Item		strokeDirectionTypeMenu[4];
 	static Fl_Menu_Item		filterTypeMenu[FilterTypes::NUM_FILTER_TYPE + 1];
+	static Fl_Menu_Item		filterSourceMenu[2 + 1];
 
 	static ImpressionistUI*	whoami(Fl_Menu_* o);
 
@@ -116,6 +125,9 @@ private:
 	static void cb_alphaSlides(Fl_Widget* o, void* v);
 
 	static void cb_filter_type_choice(Fl_Widget* o, void* v);
+	static void cb_filter_source_choice(Fl_Widget* o, void* v);
+	static void cb_filter_width_input(Fl_Widget* o, void* v);
+	static void cb_filter_height_input(Fl_Widget* o, void* v);
 	static void cb_filter_normalize_light_button(Fl_Widget* o, void* v);
 	static void cb_filter_apply_button(Fl_Widget* o, void* v);
 
