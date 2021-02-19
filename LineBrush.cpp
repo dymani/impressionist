@@ -9,9 +9,16 @@ const double PI = 3.14159265358;
 
 LineBrush::LineBrush(ImpressionistDoc* pDoc, char* name)
 	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::SLIDER) {
-	m_gaussian = new Convolution(FilterTypes::KERNEL_GAUSSIAN_5, 5, 5, true);
-	m_sobelX = new Convolution(FilterTypes::KERNEL_SOBEL_X, 3, 3, false);
-	m_sobelY = new Convolution(FilterTypes::KERNEL_SOBEL_Y, 3, 3, false);
+	m_gaussian = new Convolution(FilterTypes::KERNEL_GAUSSIAN_5, 5, 5);
+	m_gaussian->setNormalized(true);
+	m_gaussian->setRgbOutput(false);
+	m_gaussian->setValueFunction(Convolution::LUMA);
+	m_sobelX = new Convolution(FilterTypes::KERNEL_SOBEL_X, 3, 3);
+	m_sobelX->setNormalized(false);
+	m_sobelX->setRgbOutput(false);
+	m_sobelY = new Convolution(FilterTypes::KERNEL_SOBEL_Y, 3, 3);
+	m_sobelY->setNormalized(false);
+	m_sobelY->setRgbOutput(false);
 	m_currentImage = nullptr;
 }
 
@@ -26,7 +33,7 @@ void LineBrush::BrushBegin(const Point source, const Point target) {
 		if (m_currentImage != pDoc->m_ucBitmap) {
 			m_currentImage = pDoc->m_ucBitmap;
 			m_gaussian->setImage(pDoc->m_ucBitmap, pDoc->m_nPaintWidth, pDoc->m_nPaintHeight, true);
-			unsigned char* result = m_gaussian->generateResultImage();
+			unsigned char* result = m_gaussian->generateImage();
 			m_sobelX->setImage(result, pDoc->m_nPaintWidth, pDoc->m_nPaintHeight, false);
 			m_sobelY->setImage(result, pDoc->m_nPaintWidth, pDoc->m_nPaintHeight, false);
 			delete[] result;
