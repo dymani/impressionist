@@ -31,6 +31,9 @@ namespace FilterTypes {
 	enum Type {
 		GAUSSIAN_3,
 		GAUSSIAN_5,
+		SOBEL_X,
+		SOBEL_Y,
+		CUSTOM,
 		NUM_FILTER_TYPE
 	};
 
