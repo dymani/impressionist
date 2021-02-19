@@ -7,8 +7,8 @@
 #ifndef CIRCLEBRUSH_H
 #define CIRCLEBRUSH_H
 
-#include "ImpBrush.h"
 #include <math.h>
+#include "ImpBrush.h"
 
 class CircleBrush : public ImpBrush
 {

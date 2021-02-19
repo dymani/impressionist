@@ -18,6 +18,7 @@
     <ClCompile Include="Marker.cpp" />
     <ClCompile Include="Convolution.cpp" />
     <ClCompile Include="InputTable.cpp" />
+    <ClCompile Include="RandomPolygonBrush.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
@@ -37,5 +38,6 @@
     <ClInclude Include="Marker.h" />
     <ClInclude Include="Convolution.h" />
     <ClInclude Include="InputTable.h" />
+    <ClInclude Include="RandomPolygonBrush.h" />
   </ItemGroup>
 </Project>
