@@ -61,6 +61,9 @@ ImpressionistDoc::ImpressionistDoc()
 
 	m_convolutions[0] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_3, 3, 3, true);
 	m_convolutions[1] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_5, 5, 5, true);
+	m_convolutions[2] = new Convolution(FilterTypes::KERNEL_SOBEL_X, 3, 3, true);
+	m_convolutions[3] = new Convolution(FilterTypes::KERNEL_SOBEL_Y, 3, 3, true);
+	m_convolutions[4] = nullptr;
 }
 
 
@@ -281,20 +284,26 @@ int ImpressionistDoc::changeImage(char* iname) {
 	return 1;
 }
 
-int ImpressionistDoc::applyFilter(int filterType, bool isNormalized) {
+int ImpressionistDoc::applyFilter(int filterType, int filterSource, bool isNormalized) {
 	if (!m_ucBitmap)
 		return 0;
+	if (filterType == 4) // TODO: custom kernel
+		return 1;
 	m_convolutions[filterType]->setNormalized(isNormalized);
-	m_convolutions[filterType]->setImage(m_ucBitmap, m_nPaintWidth, m_nHeight, true);
-	unsigned char* result = m_convolutions[filterType]->generateResultImage();
-	if (m_ucPainting) {
-		for (int i = 0; i < m_nPaintWidth * m_nPaintHeight; ++i) {
-			m_ucPainting[i * 3] = result[i];
-			m_ucPainting[i * 3 + 1] = result[i];
-			m_ucPainting[i * 3 + 2] = result[i];
-		}
-		m_pUI->m_paintView->refresh();
+	if (filterSource == 0) {
+		m_convolutions[filterType]->setImage(m_ucBitmap, m_nPaintWidth, m_nHeight, true);
 	}
+	else {
+		m_convolutions[filterType]->setImage(m_ucPainting, m_nPaintWidth, m_nHeight, true);
+	}
+	
+	unsigned char* result = m_convolutions[filterType]->generateResultImage();
+	for (int i = 0; i < m_nPaintWidth * m_nPaintHeight; ++i) {
+		m_ucPainting[i * 3] = result[i];
+		m_ucPainting[i * 3 + 1] = result[i];
+		m_ucPainting[i * 3 + 2] = result[i];
+	}
+	m_pUI->m_paintView->refresh();
 	delete[] result;
 	return 1;
 }

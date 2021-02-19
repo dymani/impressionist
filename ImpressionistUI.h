@@ -54,6 +54,7 @@ public:
 // for filter dialog
 	Fl_Window* m_filterDialog;
 	Fl_Choice* m_filterTypeChoice;
+	Fl_Choice* m_filterSourceChoice;
 	Fl_Light_Button* m_filterNormalizeLightButton;
 	Fl_Button* m_filterApplyButton;
 
@@ -85,6 +86,7 @@ private:
 	int		m_alpha;
 
 	int m_filterType;
+	int m_filterSource;
 	bool m_isFilterNormalized;
 
 	// Static class members
@@ -92,6 +94,7 @@ private:
 	static Fl_Menu_Item		brushTypeMenu[NUM_BRUSH_TYPE+1];
 	static Fl_Menu_Item		strokeDirectionTypeMenu[4];
 	static Fl_Menu_Item		filterTypeMenu[FilterTypes::NUM_FILTER_TYPE + 1];
+	static Fl_Menu_Item		filterSourceMenu[2 + 1];
 
 	static ImpressionistUI*	whoami(Fl_Menu_* o);
 
@@ -116,6 +119,7 @@ private:
 	static void cb_alphaSlides(Fl_Widget* o, void* v);
 
 	static void cb_filter_type_choice(Fl_Widget* o, void* v);
+	static void cb_filter_source_choice(Fl_Widget* o, void* v);
 	static void cb_filter_normalize_light_button(Fl_Widget* o, void* v);
 	static void cb_filter_apply_button(Fl_Widget* o, void* v);
 

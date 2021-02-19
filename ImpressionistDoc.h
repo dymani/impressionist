@@ -9,10 +9,9 @@
 
 #include "impressionist.h"
 #include "bitmap.h"
+#include "Convolution.h"
 
 class ImpressionistUI;
-
-class Convolution;
 
 class ImpressionistDoc 
 {
@@ -27,7 +26,7 @@ public:
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
 	int swapContents();
 	int changeImage(char* name);
-	int applyFilter(int filterType, bool isNormalized);
+	int applyFilter(int filterType, int filterSource, bool isNormalized);
 
 	void	setBrushType(int type);			// called by the UI to set the brushType
 	void    setStrokeDirectionType(int type); // called by the UI to set the stroke direction type
@@ -63,7 +62,7 @@ public:
 	int m_angle;
 	int m_alpha;			
 
-	Convolution* m_convolutions[2];
+	Convolution* m_convolutions[FilterTypes::NUM_FILTER_TYPE];
 
 	ImpressionistUI*	m_pUI;
 

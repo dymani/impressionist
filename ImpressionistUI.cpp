@@ -351,6 +351,13 @@ void ImpressionistUI::cb_filter_type_choice(Fl_Widget* o, void* v) {
 	pUI->m_filterType = (int)v;
 }
 
+void ImpressionistUI::cb_filter_source_choice(Fl_Widget* o, void* v) {
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+
+	pUI->m_filterSource = (int)v;
+}
+
 void ImpressionistUI::cb_filter_normalize_light_button(Fl_Widget* o, void* v) {
 	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
 	pUI->m_isFilterNormalized = !pUI->m_isFilterNormalized;
@@ -360,7 +367,7 @@ void ImpressionistUI::cb_filter_apply_button(Fl_Widget* o, void* v) {
 	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
 	ImpressionistDoc* pDoc = pUI->getDocument();
 	
-	pDoc->applyFilter(pUI->m_filterType, pUI->m_isFilterNormalized);
+	pDoc->applyFilter(pUI->m_filterType, pUI->m_filterSource, pUI->m_isFilterNormalized);
 }
 
 
@@ -522,11 +529,18 @@ Fl_Menu_Item ImpressionistUI::strokeDirectionTypeMenu[4] = {
 
 Fl_Menu_Item ImpressionistUI::filterTypeMenu[FilterTypes::NUM_FILTER_TYPE + 1] = {
   {"Gaussian 3x3", FL_ALT + 'g', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::GAUSSIAN_3},
-  {"Gaussian 5x5",	FL_ALT + 'h', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::GAUSSIAN_5},
+  {"Gaussian 5x5", FL_ALT + 'h', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::GAUSSIAN_5},
+  {"Sobel X", FL_ALT + 'x', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::SOBEL_X},
+  {"Sobel Y", FL_ALT + 'y', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::SOBEL_Y},
+  {"Gaussian 5x5", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::CUSTOM},
   {0}
 };
 
-
+Fl_Menu_Item ImpressionistUI::filterSourceMenu[2 + 1] = {
+  {"Original image", FL_ALT + 'o', (Fl_Callback*)ImpressionistUI::cb_filter_source_choice, (void*)0},
+  {"Canvas", FL_ALT + 'v', (Fl_Callback*)ImpressionistUI::cb_filter_source_choice, (void*)1},
+  {0}
+};
 
 
 //----------------------------------------------------
@@ -641,6 +655,7 @@ ImpressionistUI::ImpressionistUI() {
     m_brushDialog->end();	
 
 	m_filterType = 0;
+	m_filterSource = 0;
 	m_isFilterNormalized = true;
 
 
@@ -651,12 +666,17 @@ ImpressionistUI::ImpressionistUI() {
 		m_filterTypeChoice->menu(filterTypeMenu);
 		m_filterTypeChoice->callback(cb_filter_type_choice);
 
-		m_filterNormalizeLightButton = new Fl_Light_Button(50, 45, 150, 25, "&Normalized");
+		m_filterSourceChoice= new Fl_Choice(50, 45, 150, 25, "&Source");
+		m_filterSourceChoice->user_data((void*)(this));	// record self to be used by static callback functions
+		m_filterSourceChoice->menu(filterSourceMenu);
+		m_filterSourceChoice->callback(cb_filter_source_choice);
+
+		m_filterNormalizeLightButton = new Fl_Light_Button(50, 80, 150, 25, "&Normalized");
 		m_filterNormalizeLightButton->user_data((void*)(this));   // record self to be used by static callback functions
 		m_filterNormalizeLightButton->value(1);
 		m_filterNormalizeLightButton->callback(cb_filter_normalize_light_button);
 
-		m_filterApplyButton = new Fl_Button(240, 80, 150, 25, "&Apply");
+		m_filterApplyButton = new Fl_Button(240, 115, 150, 25, "&Apply");
 		m_filterApplyButton->user_data((void*)(this));
 		m_filterApplyButton->callback(cb_filter_apply_button);
 
