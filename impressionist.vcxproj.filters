@@ -20,6 +20,8 @@
     <ClCompile Include="InputTable.cpp" />
     <ClCompile Include="RandomPolygonBrush.cpp" />
     <ClCompile Include="ConvolutionManager.cpp" />
+    <ClCompile Include="SharpenBrush.cpp" />
+    <ClCompile Include="BlurBrush.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
@@ -41,5 +43,7 @@
     <ClInclude Include="InputTable.h" />
     <ClInclude Include="RandomPolygonBrush.h" />
     <ClInclude Include="ConvolutionManager.h" />
+    <ClInclude Include="SharpenBrush.h" />
+    <ClInclude Include="BlurBrush.h" />
   </ItemGroup>
 </Project>

@@ -13,6 +13,7 @@ namespace Kernel {
 											  1, 4, 7, 4, 1 };
 	static const int SOBEL_X[] = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
 	static const int SOBEL_Y[] = { 1, 2, 1, 0, 0, 0, -1, -2, -1 };
+	static const int SHARPEN[] = { 0, -1, 0, -1, 5, -1, 0, -1, 0};
 }
 
 class ConvolutionManager {
@@ -31,6 +32,11 @@ public:
 		FILTER_CUSTOM,
 		NUM_FILTER_CHOICE
 	};
+	enum FilterBrush {
+		BRUSH_SHARPEN,
+		BRUSH_BLUR,
+		NUM_FILTER_BRUSH
+	};
 
 	ConvolutionManager();
 
@@ -44,6 +50,9 @@ public:
 
 	double* getPresetResult(FilterPreset preset);
 	double getPresetResultPixel(FilterPreset preset, int x, int y);
+
+	void updateFilterBrushImage(FilterBrush brush, unsigned char* image, int iWidth, int iHeight);
+	unsigned char* getFilterBrushPixel(FilterBrush brush, int x, int y);
 private:
 	unsigned char* m_image;
 	int m_iWidth, m_iHeight;
@@ -52,6 +61,8 @@ private:
 	unsigned char* m_presetImages[NUM_FILTER_PRESET];
 
 	Convolution* m_filters[NUM_FILTER_CHOICE];
+
+	Convolution* m_brushes[NUM_FILTER_BRUSH];
 };
 
 #endif
