@@ -20,10 +20,12 @@
 #include "ScatteredCircleBrush.h"
 #include "ScatteredLineBrush.h"
 #include "RandomPolygonBrush.h"
+#include "SharpenBrush.h"
+#include "BlurBrush.h"
 
 #include "LineOverlay.h"
-#include "Convolution.h"
 #include "InputTable.h"
+#include "ConvolutionManager.h"
 
 #include <vector>
 
@@ -61,27 +63,15 @@ ImpressionistDoc::ImpressionistDoc()
 	// New brush(es)
 	ImpBrush::c_pBrushes[BRUSH_RANDOM_POLYGON]
 		= new RandomPolygonBrush(this, "Random Polygon");
+	ImpBrush::c_pBrushes[BRUSH_SHARPEN]
+		= new SharpenBrush(this, "Sharpen");
+	ImpBrush::c_pBrushes[BRUSH_BLUR]
+		= new BlurBrush(this, "Blur");
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];	
 
-	m_convolutions[0] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_3, 3, 3);
-	m_convolutions[0]->setRgbOutput(true);
-	m_convolutions[0]->setValueFunction(Convolution::LUMA);
-
-	m_convolutions[1] = new Convolution(FilterTypes::KERNEL_GAUSSIAN_5, 5, 5);
-	m_convolutions[1]->setRgbOutput(true);
-	m_convolutions[1]->setValueFunction(Convolution::RED);
-
-	m_convolutions[2] = new Convolution(FilterTypes::KERNEL_SOBEL_X, 3, 3);
-	m_convolutions[2]->setRgbOutput(true);
-	m_convolutions[2]->setValueFunction(Convolution::GREEN);
-
-	m_convolutions[3] = new Convolution(FilterTypes::KERNEL_SOBEL_Y, 3, 3);
-	m_convolutions[3]->setRgbOutput(true);
-	m_convolutions[3]->setValueFunction(Convolution::BLUE);
-
-	m_convolutions[4] = nullptr;
+	m_convolutionManager = new ConvolutionManager();
 }
 
 
@@ -224,6 +214,7 @@ int ImpressionistDoc::loadImage(char *iname)
 	m_pUI->m_paintView->resizeWindow(width, height);	
 	m_pUI->m_paintView->refresh();
 
+	m_convolutionManager->initializePresets(m_ucBitmap, m_nWidth, m_nHeight);
 
 	return 1;
 }
@@ -272,6 +263,7 @@ int ImpressionistDoc::swapContents() {
 	m_ucBitmap = temp;
 	m_pUI->m_origView->refresh();
 	m_pUI->m_paintView->refresh();
+	m_convolutionManager->initializePresets(m_ucBitmap, m_nWidth, m_nHeight);
 	return 1;
 }
 
@@ -299,21 +291,24 @@ int ImpressionistDoc::changeImage(char* iname) {
 	m_pUI->m_origView->resizeWindow(width, height);
 	m_pUI->m_origView->refresh();
 
+	m_convolutionManager->initializePresets(m_ucBitmap, m_nWidth, m_nHeight);
+
 	return 1;
 }
 
 int ImpressionistDoc::applyFilter(int filterType, int filterSource, bool isNormalized) {
 	if (!m_ucBitmap)
 		return 0;
-	m_convolutions[filterType]->setNormalized(isNormalized);
+	
+	unsigned char* result;
+
 	if (filterSource == 0) {
-		m_convolutions[filterType]->setImage(m_ucBitmap, m_nPaintWidth, m_nHeight, true);
+		result = m_convolutionManager->generateFilterImage(ConvolutionManager::FilterChoice(filterType), m_ucBitmap, m_nWidth, m_nHeight, isNormalized);
 	}
 	else {
-		m_convolutions[filterType]->setImage(m_ucPainting, m_nPaintWidth, m_nHeight, true);
+		result = m_convolutionManager->generateFilterImage(ConvolutionManager::FilterChoice(filterType), m_ucPainting, m_nWidth, m_nHeight, isNormalized);
 	}
 	
-	unsigned char* result = m_convolutions[filterType]->generateImage();
 	for (int i = 0; i < m_nPaintWidth * m_nPaintHeight * 3; ++i) {
 		m_ucPainting[i] = result[i];
 	}
@@ -322,22 +317,29 @@ int ImpressionistDoc::applyFilter(int filterType, int filterSource, bool isNorma
 	return 1;
 }
 
-int ImpressionistDoc::applyCustomFilter(int kernel[], int width, int height, int filterSoruce, bool isNormalized) {
+int ImpressionistDoc::applyCustomFilter(int kernel[], int width, int height, int filterSource, bool isNormalized) {
 	if (!m_ucBitmap)
 		return 0;
-	if (m_convolutions[4])
-		delete m_convolutions[4];
 	int* kern = new int[width * height];
 	for (int r = 0; r < height; ++r) {
 		for (int c = 0; c < width; ++c) {
 			kern[r * width + c] = kernel[r * InputTable::MAX_COLS + c];
 		}
 	}
-	m_convolutions[4] = new Convolution(kern, width, height);
-	m_convolutions[4]->setRgbOutput(true);
-	m_convolutions[4]->setValueFunction(Convolution::RGB);
+	unsigned char* result;
+	if (filterSource == 0) {
+		result = m_convolutionManager->generateCustomFilterImage(kern, width, height, m_ucBitmap, m_nWidth, m_nHeight, isNormalized);
+	}
+	else {
+		result = m_convolutionManager->generateCustomFilterImage(kern, width, height, m_ucBitmap, m_nWidth, m_nHeight, isNormalized);
+	}
+	for (int i = 0; i < m_nPaintWidth * m_nPaintHeight * 3; ++i) {
+		m_ucPainting[i] = result[i];
+	}
+	m_pUI->m_paintView->refresh();
 	delete[] kern;
-	applyFilter(4, filterSoruce, isNormalized);
+	delete[] result;
+	return 1;
 }
 
 //------------------------------------------------------------------

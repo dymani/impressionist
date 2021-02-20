@@ -140,8 +140,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Bitmap.cpp" />
+    <ClCompile Include="BlurBrush.cpp" />
     <ClCompile Include="CircleBrush.cpp" />
     <ClCompile Include="Convolution.cpp" />
+    <ClCompile Include="ConvolutionManager.cpp" />
     <ClCompile Include="ImpBrush.cpp" />
     <ClCompile Include="Impressionist.cpp" />
     <ClCompile Include="ImpressionistDoc.cpp" />
@@ -157,11 +159,15 @@
     <ClCompile Include="ScatteredPointBrush.cpp" />
     <ClCompile Include="Marker.cpp" />
     <ClCompile Include="InputTable.cpp" />
+    <ClCompile Include="SharpenBrush.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
+    <ClInclude Include="BlurBrush.h" />
     <ClInclude Include="CircleBrush.h" />
     <ClInclude Include="Convolution.h" />
+    <ClInclude Include="ConvolutionManager.h" />
+    <ClInclude Include="SharpenBrush.h" />
     <ClInclude Include="ImpBrush.h" />
     <ClInclude Include="Impressionist.h" />
     <ClInclude Include="ImpressionistDoc.h" />

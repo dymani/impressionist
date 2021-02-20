@@ -3,23 +3,14 @@
 #include "impressionistDoc.h"
 #include "impressionistUI.h"
 
+#include "ConvolutionManager.h"
+
 #include <cmath>
 
 const double PI = 3.14159265358;
 
 LineBrush::LineBrush(ImpressionistDoc* pDoc, char* name)
 	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::SLIDER) {
-	m_gaussian = new Convolution(FilterTypes::KERNEL_GAUSSIAN_5, 5, 5);
-	m_gaussian->setNormalized(true);
-	m_gaussian->setRgbOutput(false);
-	m_gaussian->setValueFunction(Convolution::LUMA);
-	m_sobelX = new Convolution(FilterTypes::KERNEL_SOBEL_X, 3, 3);
-	m_sobelX->setNormalized(false);
-	m_sobelX->setRgbOutput(false);
-	m_sobelY = new Convolution(FilterTypes::KERNEL_SOBEL_Y, 3, 3);
-	m_sobelY->setNormalized(false);
-	m_sobelY->setRgbOutput(false);
-	m_currentImage = nullptr;
 }
 
 void LineBrush::BrushBegin(const Point source, const Point target) {
@@ -28,18 +19,7 @@ void LineBrush::BrushBegin(const Point source, const Point target) {
 	// save mouse location
 	m_prevTargets.clear();
 	m_prevTargets.push_back(target);
-		
-	if (m_mode == Mode::GRADIENT) {
-		if (m_currentImage != pDoc->m_ucBitmap) {
-			m_currentImage = pDoc->m_ucBitmap;
-			m_gaussian->setImage(pDoc->m_ucBitmap, pDoc->m_nPaintWidth, pDoc->m_nPaintHeight, true);
-			unsigned char* result = m_gaussian->generateImage();
-			m_sobelX->setImage(result, pDoc->m_nPaintWidth, pDoc->m_nPaintHeight, false);
-			m_sobelY->setImage(result, pDoc->m_nPaintWidth, pDoc->m_nPaintHeight, false);
-			delete[] result;
-		}
-	}
-
+	
 	updateAttributes(source, target);
 		
 	// do not draw when using mouse direction
@@ -88,8 +68,12 @@ void LineBrush::updateAttributes(const Point source, const Point target) {
 			m_angle = pDoc->getAngle();
 			break;
 		case Mode::GRADIENT:
-			m_angle = int(atan2(m_sobelX->getPixelResult(target.x, target.y), m_sobelY->getPixelResult(target.x, target.y)) / PI * 180);
-			break;
+			{
+				double x = pDoc->m_convolutionManager->getPresetResultPixel(ConvolutionManager::GRADIENT_SOBEL_X, target.x, target.y);
+				double y = pDoc->m_convolutionManager->getPresetResultPixel(ConvolutionManager::GRADIENT_SOBEL_Y, target.x, target.y);
+				m_angle = int(atan2(x, y) / PI * 180);
+				break;
+			}
 		case Mode::MOVEMENT:
 			if (m_prevTargets.size() <= 1)
 				break;

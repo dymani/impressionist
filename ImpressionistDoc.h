@@ -9,9 +9,10 @@
 
 #include "impressionist.h"
 #include "bitmap.h"
-#include "Convolution.h"
 
 class ImpressionistUI;
+
+class ConvolutionManager;
 
 class ImpressionistDoc 
 {
@@ -51,19 +52,22 @@ public:
 	int				m_nPaintWidth, 
 					m_nPaintHeight;	
 	// Bitmaps for original image and painting.
+private:
 	unsigned char*	m_ucBitmap;
 	unsigned char*	m_ucPainting;
-
+public:
+	unsigned char* getBitmap() { return m_ucBitmap; }
+	unsigned char* getPainting() { return m_ucPainting; }
 
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
 	// Size of the brush.
 	int m_nSize;	
-	int m_width;
+	int m_brushWidth;
 	int m_angle;
 	int m_alpha;			
 
-	Convolution* m_convolutions[FilterTypes::NUM_FILTER_TYPE];
+	ConvolutionManager* m_convolutionManager;
 
 	ImpressionistUI*	m_pUI;
 
