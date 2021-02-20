@@ -319,7 +319,7 @@ void ImpressionistUI::cb_sizeSlides(Fl_Widget* o, void* v)
 //-----------------------------------------------------------
 void ImpressionistUI::cb_widthSlides(Fl_Widget* o, void* v)
 {
-	((ImpressionistUI*)(o->user_data()))->m_width = int(((Fl_Slider*)o)->value());
+	((ImpressionistUI*)(o->user_data()))->m_brushWidth = int(((Fl_Slider*)o)->value());
 }
 
 //-----------------------------------------------------------
@@ -349,7 +349,7 @@ void ImpressionistUI::cb_filter_type_choice(Fl_Widget* o, void* v) {
 	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
 	ImpressionistDoc* pDoc = pUI->getDocument();
 	pUI->m_filterType = (int)v;
-	if (pUI->m_filterType == 4) {
+	if (pUI->m_filterType == ConvolutionManager::FILTER_CUSTOM) {
 		pUI->m_filterInputTable->rows(pUI->m_filterHeight);
 		pUI->m_filterInputTable->cols(pUI->m_filterWidth);
 		pUI->m_filterInputTable->activate();
@@ -394,7 +394,7 @@ void ImpressionistUI::cb_filter_normalize_light_button(Fl_Widget* o, void* v) {
 void ImpressionistUI::cb_filter_apply_button(Fl_Widget* o, void* v) {
 	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
 	ImpressionistDoc* pDoc = pUI->getDocument();
-	if (pUI->m_filterType == 4) {
+	if (pUI->m_filterType == ConvolutionManager::FILTER_CUSTOM) {
 		if(pUI->m_filterWidth % 2 == 0 || pUI->m_filterHeight % 2 == 0)
 			fl_alert("Dimension of kernel must be odd!");
 		else
@@ -473,7 +473,7 @@ void ImpressionistUI::setSize( int size )
 //------------------------------------------------
 int ImpressionistUI::getWidth()
 {
-	return m_width;
+	return m_brushWidth;
 }
 
 //-------------------------------------------------
@@ -483,8 +483,8 @@ void ImpressionistUI::setWidth(int width)
 {
 	if (width < 0) width = 0;
 	if (width > 40) width = 40;
-	m_width = width;
-	m_LineWidthSlider->value(m_width);
+	m_brushWidth = width;
+	m_LineWidthSlider->value(m_brushWidth);
 }
 
 //------------------------------------------------
@@ -563,12 +563,12 @@ Fl_Menu_Item ImpressionistUI::strokeDirectionTypeMenu[4] = {
   {0}
 };
 
-Fl_Menu_Item ImpressionistUI::filterTypeMenu[FilterTypes::NUM_FILTER_TYPE + 1] = {
-  {"Gaussian 3x3", FL_ALT + 'g', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::GAUSSIAN_3},
-  {"Gaussian 5x5", FL_ALT + 'h', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::GAUSSIAN_5},
-  {"Sobel X", FL_ALT + 'x', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::SOBEL_X},
-  {"Sobel Y", FL_ALT + 'y', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::SOBEL_Y},
-  {"Custom...", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)FilterTypes::CUSTOM},
+Fl_Menu_Item ImpressionistUI::filterTypeMenu[ConvolutionManager::NUM_FILTER_CHOICE + 1] = {
+  {"Gaussian 3x3", FL_ALT + 'g', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_GAUSSIAN_3},
+  {"Gaussian 5x5", FL_ALT + 'h', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_GAUSSIAN_3},
+  {"Sobel X", FL_ALT + 'x', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_SOBEL_X},
+  {"Sobel Y", FL_ALT + 'y', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_SOBEL_Y},
+  {"Custom...", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_CUSTOM},
   {0}
 };
 
@@ -611,7 +611,7 @@ ImpressionistUI::ImpressionistUI() {
 	// init values
 
 	m_nSize = 10;
-	m_width = 1;
+	m_brushWidth = 1;
 	m_angle = 0;
 	m_alpha = 255;
 
@@ -656,7 +656,7 @@ ImpressionistUI::ImpressionistUI() {
 		m_LineWidthSlider->minimum(1);
 		m_LineWidthSlider->maximum(40);
 		m_LineWidthSlider->step(1);
-		m_LineWidthSlider->value(m_width);
+		m_LineWidthSlider->value(m_brushWidth);
 		m_LineWidthSlider->align(FL_ALIGN_RIGHT);
 		m_LineWidthSlider->callback(cb_widthSlides);
 		m_LineWidthSlider->deactivate();

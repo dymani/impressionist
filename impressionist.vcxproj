@@ -142,6 +142,7 @@
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="CircleBrush.cpp" />
     <ClCompile Include="Convolution.cpp" />
+    <ClCompile Include="ConvolutionManager.cpp" />
     <ClCompile Include="ImpBrush.cpp" />
     <ClCompile Include="Impressionist.cpp" />
     <ClCompile Include="ImpressionistDoc.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="bitmap.h" />
     <ClInclude Include="CircleBrush.h" />
     <ClInclude Include="Convolution.h" />
+    <ClInclude Include="ConvolutionManager.h" />
     <ClInclude Include="ImpBrush.h" />
     <ClInclude Include="Impressionist.h" />
     <ClInclude Include="ImpressionistDoc.h" />

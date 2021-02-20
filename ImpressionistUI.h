@@ -22,7 +22,7 @@
 #include "PaintView.h"
 #include "LineOverlay.h"
 #include "Marker.h"
-#include "Convolution.h"
+#include "ConvolutionManager.h"
 
 #include "ImpBrush.h"
 
@@ -85,7 +85,7 @@ private:
 
 	// All attributes here
 	int		m_nSize;
-	int		m_width;
+	int		m_brushWidth;
 	int		m_angle;
 	int		m_alpha;
 
@@ -99,7 +99,7 @@ private:
 	static Fl_Menu_Item		menuitems[];
 	static Fl_Menu_Item		brushTypeMenu[NUM_BRUSH_TYPE+1];
 	static Fl_Menu_Item		strokeDirectionTypeMenu[4];
-	static Fl_Menu_Item		filterTypeMenu[FilterTypes::NUM_FILTER_TYPE + 1];
+	static Fl_Menu_Item		filterTypeMenu[ConvolutionManager::NUM_FILTER_CHOICE + 1];
 	static Fl_Menu_Item		filterSourceMenu[2 + 1];
 
 	static ImpressionistUI*	whoami(Fl_Menu_* o);

@@ -79,7 +79,7 @@ void PaintView::draw()
 	int startrow = m_pDoc->m_nPaintHeight - (scrollpos.y + drawHeight);
 	if ( startrow < 0 ) startrow = 0;
 
-	m_pPaintBitstart = m_pDoc->m_ucPainting + 
+	m_pPaintBitstart = m_pDoc->getPainting() + 
 		3 * ((m_pDoc->m_nPaintWidth * startrow) + scrollpos.x);
 
 	m_nDrawWidth	= drawWidth;
@@ -90,13 +90,13 @@ void PaintView::draw()
 	m_nStartCol		= scrollpos.x;
 	m_nEndCol		= m_nStartCol + drawWidth;
 
-	if ( m_pDoc->m_ucPainting && !isAnEvent) 
+	if ( m_pDoc->getPainting() && !isAnEvent)
 	{
 		RestoreContent();
 
 	}
 
-	if ( m_pDoc->m_ucPainting && isAnEvent) 
+	if ( m_pDoc->getPainting() && isAnEvent)
 	{
 
 		// Clear it after processing.
@@ -149,16 +149,16 @@ void PaintView::draw()
 	glBegin(GL_QUADS);
 		glColor3ub(178, 178, 178);
 		glVertex2f(0, 0);
-		glVertex2f(m_nWindowWidth, 0);
-		glVertex2f(m_nWindowWidth, m_nWindowHeight - m_nDrawHeight);
-		glVertex2f(0, m_nWindowHeight - m_nDrawHeight);
+		glVertex2f((float)m_nWindowWidth, 0);
+		glVertex2f((float)m_nWindowWidth, (float)m_nWindowHeight - m_nDrawHeight);
+		glVertex2f(0, (float)m_nWindowHeight - m_nDrawHeight);
 	glEnd();
 	glBegin(GL_QUADS);
 		glColor3ub(178, 178, 178);
-		glVertex2f(m_nDrawWidth, m_nWindowHeight - m_nDrawHeight);
-		glVertex2f(m_nWindowWidth, m_nWindowHeight - m_nDrawHeight);
-		glVertex2f(m_nWindowWidth, m_nWindowHeight);
-		glVertex2f(m_nDrawWidth, m_nWindowHeight);
+		glVertex2f((float)m_nDrawWidth, (float)m_nWindowHeight - m_nDrawHeight);
+		glVertex2f((float)m_nWindowWidth, (float)m_nWindowHeight - m_nDrawHeight);
+		glVertex2f((float)m_nWindowWidth, (float)m_nWindowHeight);
+		glVertex2f((float)m_nDrawWidth, (float)m_nWindowHeight);
 	glEnd();
 
 	glFlush();

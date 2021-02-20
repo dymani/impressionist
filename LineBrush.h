@@ -2,7 +2,6 @@
 #define LINE_BRUSH_H
 
 #include "ImpBrush.h"
-#include "Convolution.h"
 
 #include <vector>
 
@@ -27,10 +26,8 @@ protected:
 	void drawLine(const Point source, const Point target);
 	int m_size, m_width, m_angle;	
 	Mode m_mode;
-	const int MOUSE_HISTORY_SIZE = 5;
+	const unsigned int MOUSE_HISTORY_SIZE = 5;
 	std::vector<Point> m_prevTargets;
-	Convolution* m_gaussian, *m_sobelX, *m_sobelY;
-	unsigned char* m_currentImage;
 };
 
 #endif
