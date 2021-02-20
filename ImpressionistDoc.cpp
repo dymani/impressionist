@@ -20,6 +20,8 @@
 #include "ScatteredCircleBrush.h"
 #include "ScatteredLineBrush.h"
 #include "RandomPolygonBrush.h"
+#include "SharpenBrush.h"
+#include "BlurBrush.h"
 
 #include "LineOverlay.h"
 #include "InputTable.h"
@@ -61,6 +63,10 @@ ImpressionistDoc::ImpressionistDoc()
 	// New brush(es)
 	ImpBrush::c_pBrushes[BRUSH_RANDOM_POLYGON]
 		= new RandomPolygonBrush(this, "Random Polygon");
+	ImpBrush::c_pBrushes[BRUSH_SHARPEN]
+		= new SharpenBrush(this, "Sharpen");
+	ImpBrush::c_pBrushes[BRUSH_BLUR]
+		= new BlurBrush(this, "Blur");
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];	

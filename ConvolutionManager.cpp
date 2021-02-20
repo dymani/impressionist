@@ -38,6 +38,16 @@ ConvolutionManager::ConvolutionManager() {
 	for (int i = 0; i < NUM_FILTER_PRESET; ++i) {
 		m_presetImages[i] = nullptr;
 	}
+
+	m_brushes[BRUSH_SHARPEN] = new Convolution(Kernel::SHARPEN, 3, 3);
+	m_brushes[BRUSH_SHARPEN]->setValueFunction(Convolution::RGB);
+	m_brushes[BRUSH_SHARPEN]->setRgbOutput(true);
+	m_brushes[BRUSH_SHARPEN]->setNormalized(true);
+
+	m_brushes[BRUSH_BLUR] = new Convolution(Kernel::GAUSSIAN_3, 3, 3);
+	m_brushes[BRUSH_BLUR]->setValueFunction(Convolution::RGB);
+	m_brushes[BRUSH_BLUR]->setRgbOutput(true);
+	m_brushes[BRUSH_BLUR]->setNormalized(true);
 }
 
 void ConvolutionManager::initializePresets(unsigned char* image, int iWidth, int iHeight) {
@@ -113,4 +123,31 @@ double ConvolutionManager::getPresetResultPixel(FilterPreset preset, int x, int 
 		default:
 			return 0;
 	}
+}
+
+void ConvolutionManager::updateFilterBrushImage(FilterBrush brush, unsigned char* image, int iWidth, int iHeight) {
+	if (brush == NUM_FILTER_BRUSH)
+		return;
+	m_brushes[brush]->setImage(image, iWidth, iHeight, true);
+	m_brushes[brush]->compute();
+}
+
+unsigned char* ConvolutionManager::getFilterBrushPixel(FilterBrush brush, int x, int y) {
+	if (brush == NUM_FILTER_BRUSH)
+		return nullptr;
+	unsigned char* pixel = new unsigned char[3];
+	double r;
+	r = m_brushes[brush]->getPixelResult(x, y, 0);
+	r = r < 0 ? 0 : r;
+	r = r > 255 ? 255 : r;
+	pixel[0] = (unsigned char)r;
+	r = m_brushes[brush]->getPixelResult(x, y, 1);
+	r = r < 0 ? 0 : r;
+	r = r > 255 ? 255 : r;
+	pixel[1] = (unsigned char)r;
+	r = m_brushes[brush]->getPixelResult(x, y, 2);
+	r = r < 0 ? 0 : r;
+	r = r > 255 ? 255 : r;
+	pixel[2] = (unsigned char)r;
+	return pixel;
 }
