@@ -21,6 +21,11 @@ void RandomPolygonBrush::BrushBegin(const Point source, const Point target)
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg = pDoc->m_pUI;
 
+
+	// Generate random number of vertices of the polygon
+	srand(time(NULL));
+	numOfVertices = rand() % 14 + 3;
+
 	BrushMove(source, target);
 }
 
@@ -33,10 +38,6 @@ void RandomPolygonBrush::BrushMove(const Point source, const Point target)
 		printf("ScatteredCircleBrush::BrushMove  document is NULL\n");
 		return;
 	}
-
-	// Generate random number of vertices of the polygon
-	srand(time(NULL));
-	numOfVertices = rand() % 14 + 3;
 
 	// Get the radius
 	float r = (double)pDoc->getSize() / 2.0f;
