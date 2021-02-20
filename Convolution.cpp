@@ -39,10 +39,11 @@ Convolution::~Convolution() {
 
 void Convolution::setImage(const unsigned char* image, int iWidth, int iHeight, bool isRgbInput) {
 	m_isCharImage = true;
-	bool reuse = (m_iWidth == iWidth && m_iHeight == iHeight && m_isRgbInput == isRgbInput);
-	if (!reuse) {
+	bool canReuse = (m_iWidth == iWidth && m_iHeight == iHeight && m_isRgbInput == isRgbInput);
+	if (!canReuse) {
 		if (m_imageC) {
 			delete[] m_imageC;
+			m_imageC = nullptr;
 		}
 	}
 	if (m_imageD) {
@@ -57,7 +58,7 @@ void Convolution::setImage(const unsigned char* image, int iWidth, int iHeight, 
 	m_iHeight = iHeight;
 	m_isRgbInput = isRgbInput;
 	if (m_isRgbInput) {
-		if(!reuse)
+		if(!m_imageC)
 			m_imageC = new unsigned char[m_iWidth * m_iHeight * 3];
 		for (int i = 0; i < m_iHeight * m_iWidth; ++i) {
 			m_imageC[i] = image[i * 3];
@@ -66,7 +67,7 @@ void Convolution::setImage(const unsigned char* image, int iWidth, int iHeight, 
 		}
 	}
 	else {
-		if(!reuse)
+		if (!m_imageC)
 			m_imageC = new unsigned char[m_iWidth * m_iHeight];
 		memcpy(m_imageC, image, m_iWidth * m_iHeight * sizeof(unsigned char));
 	}
@@ -75,10 +76,11 @@ void Convolution::setImage(const unsigned char* image, int iWidth, int iHeight, 
 
 void Convolution::setImage(const double* image, int iWidth, int iHeight, bool isRgbInput) {
 	m_isCharImage = false;
-	bool reuse = (m_iWidth == iWidth && m_iHeight == iHeight && m_isRgbInput == isRgbInput);
-	if (!reuse) {
+	bool canReuse = (m_iWidth == iWidth && m_iHeight == iHeight && m_isRgbInput == isRgbInput);
+	if (!canReuse) {
 		if (m_imageD) {
 			delete[] m_imageD;
+			m_imageD = nullptr;
 		}
 	}
 	if (m_imageC) {
@@ -93,7 +95,7 @@ void Convolution::setImage(const double* image, int iWidth, int iHeight, bool is
 	m_iHeight = iHeight;
 	m_isRgbInput = isRgbInput;
 	if (m_isRgbInput) {
-		if (!reuse) {
+		if (!m_imageD) {
 			m_imageD = new double[m_iWidth * m_iHeight * 3];
 		}
 		for (int i = 0; i < m_iHeight * m_iWidth; ++i) {
@@ -103,7 +105,7 @@ void Convolution::setImage(const double* image, int iWidth, int iHeight, bool is
 		}
 	}
 	else {
-		if (!reuse) {
+		if (!m_imageD) {
 			m_imageD = new double[m_iWidth * m_iHeight];
 		}
 		memcpy(m_imageD, image, m_iWidth * m_iHeight * sizeof(double));
@@ -112,12 +114,14 @@ void Convolution::setImage(const double* image, int iWidth, int iHeight, bool is
 }
 
 void Convolution::setValueFunction(RgbInputChannel choice) {
-	m_wasModified = m_rgbInputChannel != choice;
+	if(m_rgbInputChannel != choice)
+		m_wasModified = true;
 	m_rgbInputChannel = choice;
 }
 
 void Convolution::setNormalized(bool isNormalized) {
-	m_wasModified = m_isNormalized != isNormalized;
+	if (m_isNormalized != isNormalized)
+		m_wasModified = true;
 	m_isNormalized = isNormalized;
 }
 
@@ -246,6 +250,9 @@ double Convolution::computePixel(int x, int y, int rgbOffset) {
 }
 
 double* Convolution::getResult() {
+	if (!m_imageC && !m_imageD)
+		return nullptr;
+	compute();
 	return m_result;
 }
 

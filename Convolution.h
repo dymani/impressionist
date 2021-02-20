@@ -70,27 +70,4 @@ protected:
 	double* m_result;
 };
 
-namespace FilterTypes {
-	enum Type {
-		GAUSSIAN_3,
-		GAUSSIAN_5,
-		SOBEL_X,
-		SOBEL_Y,
-		CUSTOM,
-		NUM_FILTER_TYPE
-	};
-
-	static const int KERNEL_GAUSSIAN_3[] = { 1, 2, 1, 2, 4, 2, 1, 2, 1 };
-	static const int KERNEL_GAUSSIAN_5[] = {  1, 4, 7, 4, 1,
-											  4, 16, 26, 16, 4,
-											  7, 26, 41, 26, 7,
-											  4, 16, 26, 16, 4,
-											  1, 4, 7, 4, 1 };
-	static const int KERNEL_SOBEL_X[] = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
-	static const int KERNEL_SOBEL_Y[] = { 1, 2, 1, 0, 0, 0, -1, -2, -1 };
-
-}
-
-
-
 #endif 
