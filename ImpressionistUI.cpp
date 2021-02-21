@@ -257,6 +257,10 @@ void ImpressionistUI::cb_about(Fl_Menu_* o, void* v)
 	fl_message("Impressionist FLTK version for CS341, Spring 2002");
 }
 
+void ImpressionistUI::cb_colors(Fl_Menu_* o, void* v)
+{
+	whoami(o)->m_colorDialog->show();
+}
 
 void ImpressionistUI::cb_filters(Fl_Menu_* o, void* v) {
 	whoami(o)->m_filterDialog->show();
@@ -290,6 +294,7 @@ void ImpressionistUI::cb_clear_canvas_button(Fl_Widget* o, void* v)
 
 	pDoc->clearCanvas();
 }
+
 
 
 void ImpressionistUI::cb_strokeDirectionChoice(Fl_Widget* o, void* v)
@@ -341,6 +346,16 @@ void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
 {
 	int convert = (int)(((Fl_Slider*)o)->value() * 255);
 	((ImpressionistUI*)(o->user_data()))->m_alpha = int(convert);
+}
+
+//-----------------------------------------------------------
+// Updates the color choice
+//-----------------------------------------------------------
+void ImpressionistUI::cb_color_chooser(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_redVal = ((Fl_Color_Chooser*)o)->r();
+	((ImpressionistUI*)(o->user_data()))->m_greenVal = ((Fl_Color_Chooser*)o)->g();
+	((ImpressionistUI*)(o->user_data()))->m_blueVal = ((Fl_Color_Chooser*)o)->b();
 }
 
 //---------------------------------- filter dialog functions --------------------------------------
@@ -523,6 +538,54 @@ void ImpressionistUI::setAlpha(int alpha)
 	m_alpha = alpha;
 }
 
+//-------------------------------------------------
+// Get the red value
+//-------------------------------------------------
+double ImpressionistUI::getRedVal()
+{
+	return m_redVal;
+}
+
+//-------------------------------------------------
+// Set the red value
+//-------------------------------------------------
+void ImpressionistUI::setRedVal(double R)
+{
+	m_redVal = R;
+}
+
+//-------------------------------------------------
+// Get the green value
+//-------------------------------------------------
+double ImpressionistUI::getGreenVal()
+{
+	return m_greenVal;
+}
+
+//-------------------------------------------------
+// Set the green value
+//-------------------------------------------------
+void ImpressionistUI::setGreenVal(double G)
+{
+	m_greenVal = G;
+}
+
+//-------------------------------------------------
+// Get the blue value
+//-------------------------------------------------
+double ImpressionistUI::getBlueVal()
+{
+	return m_blueVal;
+}
+
+//-------------------------------------------------
+// Set the blue value
+//-------------------------------------------------
+void ImpressionistUI::setBlueVal(double B)
+{
+	m_blueVal = B;
+}
+
 // Main menu definition
 Fl_Menu_Item ImpressionistUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -530,6 +593,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)ImpressionistUI::cb_save_image },
 		{ "&Brushes...",	FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_brushes },
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_clear_canvas , 0, FL_MENU_DIVIDER },
+		{ "&Colors...", FL_ALT + 'k', (Fl_Callback *)ImpressionistUI::cb_colors, 0, FL_MENU_DIVIDER },
 		{ "S&wap contents", FL_ALT + 'w', (Fl_Callback *)ImpressionistUI::cb_swap_contents,},
 		{ "Change &mural image", FL_ALT + 'm', (Fl_Callback*)ImpressionistUI::cb_change_image, 0, FL_MENU_DIVIDER },
 		{ "&Filters...", FL_ALT + 'f', (Fl_Callback*)ImpressionistUI::cb_filters, 0, FL_MENU_DIVIDER },
@@ -616,6 +680,9 @@ ImpressionistUI::ImpressionistUI() {
 	m_brushWidth = 1;
 	m_angle = 0;
 	m_alpha = 255;
+	m_redVal = 1.0;
+	m_greenVal = 1.0;
+	m_blueVal = 1.0;
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
@@ -692,13 +759,23 @@ ImpressionistUI::ImpressionistUI() {
 
     m_brushDialog->end();	
 
+	// color dialog definition
+	m_colorDialog = new Fl_Window(300, 225, "Color Select");
+		m_colorChooser = new Fl_Color_Chooser(50, 20, 150, 150, "Color Blending");
+		m_colorChooser->user_data((void*)(this));	// record self to be used by static callback functions
+		m_colorChooser->rgb(m_redVal, m_greenVal, m_blueVal);
+		m_colorChooser->callback(cb_color_chooser);
+	m_colorDialog->end();
+
+	// init values
+
 	m_filterType = 0;
 	m_filterSource = 0;
 	m_filterWidth = 3;
 	m_filterHeight = 3;
 	m_isFilterNormalized = true;
 
-
+	// filter dialog definition
 	m_filterDialog = new Fl_Double_Window(400, 400, "Filter Dialog");
 		m_filterSourceChoice = new Fl_Choice(50, 10, 150, 25, "&Source");
 		m_filterSourceChoice->user_data((void*)(this));	// record self to be used by static callback functions

@@ -15,6 +15,7 @@
 #include <FL/Fl_Choice.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Light_Button.H>
+#include <FL/Fl_Color_Chooser.H>
 #include "InputTable.h"
 
 #include "Impressionist.h"
@@ -52,6 +53,10 @@ public:
 
 	Fl_Button*          m_ClearCanvasButton;
 
+// for color dialog
+	Fl_Window*			m_colorDialog;
+	Fl_Color_Chooser*	m_colorChooser;
+
 // for filter dialog
 	Fl_Window* m_filterDialog;
 	Fl_Choice* m_filterSourceChoice;
@@ -79,6 +84,12 @@ public:
 	void				setAngle(int angle);
 	int					getAlpha();
 	void				setAlpha(int alpha);
+	double				getRedVal();
+	void				setRedVal(double R);
+	double				getGreenVal();
+	void				setGreenVal(double G);
+	double				getBlueVal();
+	void				setBlueVal(double B);
 
 private:
 	ImpressionistDoc*	m_pDoc;		// pointer to document to communicate with the document
@@ -88,6 +99,10 @@ private:
 	int		m_brushWidth;
 	int		m_angle;
 	int		m_alpha;
+
+	double	m_redVal;
+	double	m_greenVal;
+	double	m_blueVal;
 
 	int m_filterType;
 	int m_filterSource;
@@ -110,6 +125,7 @@ private:
 	static void	cb_save_image(Fl_Menu_* o, void* v);
 	static void	cb_brushes(Fl_Menu_* o, void* v);
 	static void	cb_clear_canvas(Fl_Menu_* o, void* v);
+	static void cb_colors(Fl_Menu_* o, void* v);
 	static void	cb_swap_contents(Fl_Menu_* o, void* v);
 	static void cb_change_image(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
@@ -123,6 +139,8 @@ private:
 	static void cb_widthSlides(Fl_Widget* o, void* v);
 	static void cb_angleSlides(Fl_Widget* o, void* v);
 	static void cb_alphaSlides(Fl_Widget* o, void* v);
+
+	static void cb_color_chooser(Fl_Widget* o, void* v);
 
 	static void cb_filter_type_choice(Fl_Widget* o, void* v);
 	static void cb_filter_source_choice(Fl_Widget* o, void* v);

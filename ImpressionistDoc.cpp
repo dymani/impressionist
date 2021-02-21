@@ -167,6 +167,54 @@ void ImpressionistDoc::setAlpha(int alpha) {
 	m_pUI->setAlpha(alpha);
 }
 
+//-------------------------------------------------
+// Get the red value
+//-------------------------------------------------
+double ImpressionistDoc::getRedVal()
+{
+	return m_pUI->getRedVal();
+}
+
+//-------------------------------------------------
+// Set the red value
+//-------------------------------------------------
+void ImpressionistDoc::setRedVal(double R)
+{
+	m_pUI->setRedVal(R);
+}
+
+//-------------------------------------------------
+// Get the green value
+//-------------------------------------------------
+double ImpressionistDoc::getGreenVal()
+{
+	return m_pUI->getGreenVal();
+}
+
+//-------------------------------------------------
+// Set the green value
+//-------------------------------------------------
+void ImpressionistDoc::setGreenVal(double G)
+{
+	m_pUI->setGreenVal(G);
+}
+
+//-------------------------------------------------
+// Get the blue value
+//-------------------------------------------------
+double ImpressionistDoc::getBlueVal()
+{
+	return m_pUI->getBlueVal();
+}
+
+//-------------------------------------------------
+// Set the blue value
+//-------------------------------------------------
+void ImpressionistDoc::setBlueVal(double B)
+{
+	m_pUI->setBlueVal(B);;
+}
+
 //---------------------------------------------------------
 // Load the specified image
 // This is called by the UI when the load image button is 
