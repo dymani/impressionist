@@ -40,8 +40,14 @@ public:
 	void	setAngle(int angle);			// set the line angle
 	int 	getAlpha();						// get the alpha value
 	void	setAlpha(int alpha);			// set the alpha value
+	double	getRedVal();				
+	void	setRedVal(double R);
+	double	getGreenVal();
+	void	setGreenVal(double G);
+	double	getBlueVal();
+	void	setBlueVal(double B);
 	char*	getImageName();					// get the current image name
-	
+
 
 // Attributes
 public:
@@ -66,6 +72,10 @@ public:
 	int m_brushWidth;
 	int m_angle;
 	int m_alpha;			
+
+	double	m_redVal;
+	double	m_greenVal;
+	double	m_blueVal;
 
 	ConvolutionManager* m_convolutionManager;
 
