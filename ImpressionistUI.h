@@ -52,6 +52,7 @@ public:
 	Fl_Slider*			m_AlphaSlider;
 
 	Fl_Light_Button* m_anotherGradientLightButton;
+	Fl_Light_Button* m_edgeClipLightButton;
 
 	Fl_Button*          m_ClearCanvasButton;
 
@@ -103,8 +104,10 @@ private:
 	int		m_brushWidth;
 	int		m_angle;
 	int		m_alpha;
-	bool m_isAnotherGradient;
-	bool m_isAnotherActivated;
+	bool m_isUsingAnotherGradient;
+	bool m_isAnotherImageLoaded;
+	bool m_isEdgeClippingOn;
+	bool m_isEdgeImageLoaded;
 
 	double	m_redVal;
 	double	m_greenVal;
@@ -135,6 +138,7 @@ private:
 	static void	cb_swap_contents(Fl_Menu_* o, void* v);
 	static void cb_change_image(Fl_Menu_* o, void* v);
 	static void cb_load_another_image(Fl_Menu_* o, void* v);
+	static void cb_load_edge_image(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
 	static void	cb_filters(Fl_Menu_* o, void* v);
@@ -147,6 +151,7 @@ private:
 	static void cb_angleSlides(Fl_Widget* o, void* v);
 	static void cb_alphaSlides(Fl_Widget* o, void* v);
 	static void cb_another_gradient_light_button(Fl_Widget* o, void* v);
+	static void cb_edge_clip_light_button(Fl_Widget* o, void* v);
 
 	static void cb_color_chooser(Fl_Widget* o, void* v);
 

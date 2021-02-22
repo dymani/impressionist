@@ -33,11 +33,37 @@ void ScatteredLineBrush::BrushMove(const Point source, const Point target) {
 
 	int correctAngle = angleRegression();
 
+	GLubyte color[3];
+	memcpy(color, pDoc->getEdgePixel(source.x, source.y), 3);
+	double sinT = sin(m_angle * PI / 180);
+	double cosT = cos(m_angle * PI / 180);
+	double y = m_width / 2.0;
+
 	int sx, sy;
 	for (int i = 0; i < m_numLines; ++i) {
 		sx = rand() % m_size - (int)(m_size / 2);
 		sy = rand() % m_size - (int)(m_size / 2);
-		
+
+
+		if (pDoc->m_isEdgeClippingOn) {
+			double lim1 = 0, lim2 = 0;
+			for (double j = 0; j <= m_size / 2; ++j) {
+				if (!isEqual(color, pDoc->getEdgePixel(source.x - j * cosT, source.y - j * sinT)))
+					break;
+				lim1 = j;
+			}
+			for (double j = 0; j <= m_size / 2; ++j) {
+				if (!isEqual(color, pDoc->getEdgePixel(source.x + j * cosT, source.y + j * sinT)))
+					break;
+				lim2 = j;
+			}
+			double px = sx * cosT + sy * sinT;
+			if (px < -lim1 || px > lim2) {
+				--i;
+				continue;
+			}
+		}
+
 		updateAttributes(Point(source.x + sx, source.y + sy), Point(target.x + sx, target.y + sy));
 
 		if (m_mode == Mode::MOVEMENT) // correct angle for movement brush

@@ -41,7 +41,9 @@ ImpressionistDoc::ImpressionistDoc()
 	m_ucBitmap		= NULL;
 	m_ucPainting	= NULL;
 	m_ucAnotherImage = nullptr;
-	m_isAnotherGradient = false;
+	m_isUsingAnotherGradient = false;
+	m_ucEdgeImage = nullptr;
+	m_isEdgeClippingOn = false;
 
 
 	// create one instance of each brush
@@ -91,6 +93,23 @@ void ImpressionistDoc::setUI(ImpressionistUI* ui)
 char* ImpressionistDoc::getImageName() 
 {
 	return m_imageName;
+}
+
+
+unsigned char* ImpressionistDoc::getBitmap() {
+	return m_ucBitmap; 
+}
+
+unsigned char* ImpressionistDoc::getPainting() { 
+	return m_ucPainting;
+}
+
+unsigned char* ImpressionistDoc::getAnotherImage() { 
+	return m_ucAnotherImage;
+}
+
+unsigned char* ImpressionistDoc::getEdgeImage() {
+	return m_ucEdgeImage;
 }
 
 //---------------------------------------------------------
@@ -158,11 +177,19 @@ void ImpressionistDoc::setAlpha(int alpha) {
 }
 
 void ImpressionistDoc::updateConvolutionPresetImage(bool isAnotherImage) {
-	m_isAnotherGradient = isAnotherImage;
-	if (m_isAnotherGradient)
+	if (!m_ucAnotherImage)
+		return;
+	m_isUsingAnotherGradient = isAnotherImage;
+	if (m_isUsingAnotherGradient)
 		m_convolutionManager->initializePresets(m_ucAnotherImage, m_nWidth, m_nHeight);
 	else
 		m_convolutionManager->initializePresets(m_ucBitmap, m_nWidth, m_nHeight);
+}
+
+void ImpressionistDoc::setEdgeClipping(bool isEdgeClippingOn) {
+	if (!m_ucEdgeImage)
+		return;
+	m_isEdgeClippingOn = isEdgeClippingOn;
 }
 
 
@@ -250,7 +277,7 @@ int ImpressionistDoc::loadImage(char *iname)
 	memset(m_ucPainting, 0, width*height*3);
 
 	m_ucAnotherImage = nullptr;
-	m_isAnotherGradient = false;
+	m_isUsingAnotherGradient = false;
 
 	m_pUI->m_mainWindow->resize(m_pUI->m_mainWindow->x(), 
 								m_pUI->m_mainWindow->y(), 
@@ -265,7 +292,7 @@ int ImpressionistDoc::loadImage(char *iname)
 	m_pUI->m_paintView->resizeWindow(width, height);	
 	m_pUI->m_paintView->refresh();
 
-	updateConvolutionPresetImage(m_isAnotherGradient);
+	updateConvolutionPresetImage(m_isUsingAnotherGradient);
 
 	return 1;
 }
@@ -314,7 +341,7 @@ int ImpressionistDoc::swapContents() {
 	m_ucBitmap = temp;
 	m_pUI->m_origView->refresh();
 	m_pUI->m_paintView->refresh();
-	updateConvolutionPresetImage(m_isAnotherGradient);
+	updateConvolutionPresetImage(m_isUsingAnotherGradient);
 	return 1;
 }
 
@@ -342,7 +369,7 @@ int ImpressionistDoc::changeImage(char* iname) {
 	m_pUI->m_origView->resizeWindow(width, height);
 	m_pUI->m_origView->refresh();
 
-	updateConvolutionPresetImage(m_isAnotherGradient);
+	updateConvolutionPresetImage(m_isUsingAnotherGradient);
 
 	return 1;
 }
@@ -367,7 +394,30 @@ int ImpressionistDoc::loadAnotherImage(char* name) {
 	if (m_ucAnotherImage) delete[] m_ucAnotherImage;
 	m_ucAnotherImage = data;
 
-	updateConvolutionPresetImage(m_isAnotherGradient);
+	updateConvolutionPresetImage(m_isUsingAnotherGradient);
+
+	return 1;
+}
+
+int ImpressionistDoc::loadEdgeImage(char* name) {
+	// try to open the image to read
+	unsigned char* data;
+	int width, height;
+
+	if ((data = readBMP(name, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	if (m_nWidth != width || m_nHeight != height) {
+		fl_alert("Edge image should have the same dimension");
+		return 0;
+	}
+
+	// release old storage
+	if (m_ucEdgeImage) delete[] m_ucEdgeImage;
+	m_ucEdgeImage = data;
 
 	return 1;
 }
@@ -444,3 +494,19 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 	return GetOriginalPixel( p.x, p.y );
 }
 
+
+GLubyte* ImpressionistDoc::getEdgePixel(int x, int y) {
+	if (!m_ucEdgeImage)
+		return nullptr;
+	if (x < 0)
+		x = 0;
+	else if (x >= m_nWidth)
+		x = m_nWidth - 1;
+
+	if (y < 0)
+		y = 0;
+	else if (y >= m_nHeight)
+		y = m_nHeight - 1;
+
+	return (GLubyte*)(m_ucEdgeImage+ 3 * (y * m_nWidth + x));
+}
