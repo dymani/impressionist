@@ -40,6 +40,8 @@ ImpressionistDoc::ImpressionistDoc()
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
 	m_ucPainting	= NULL;
+	m_ucAnotherImage = nullptr;
+	m_isAnotherGradient = false;
 
 
 	// create one instance of each brush
@@ -98,18 +100,6 @@ char* ImpressionistDoc::getImageName()
 void ImpressionistDoc::setBrushType(int type)
 {
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[type];
-
-	// Check if certain attributes are available for certain brush types
-	if (type == BRUSH_LINES || type == BRUSH_SCATTERED_LINES) {
-		m_pUI->m_strokeDirectionChoice->activate();
-		m_pUI->m_LineWidthSlider->activate();
-		m_pUI->m_LineAngleSlider->activate();
-	}
-	else {
-		m_pUI->m_strokeDirectionChoice->deactivate();
-		m_pUI->m_LineWidthSlider->deactivate();
-		m_pUI->m_LineAngleSlider->deactivate();
-	}
 }
 
 void ImpressionistDoc::setStrokeDirectionType(int type) {
@@ -166,6 +156,15 @@ int ImpressionistDoc::getAlpha()
 void ImpressionistDoc::setAlpha(int alpha) {
 	m_pUI->setAlpha(alpha);
 }
+
+void ImpressionistDoc::updateConvolutionPresetImage(bool isAnotherImage) {
+	m_isAnotherGradient = isAnotherImage;
+	if (m_isAnotherGradient)
+		m_convolutionManager->initializePresets(m_ucAnotherImage, m_nWidth, m_nHeight);
+	else
+		m_convolutionManager->initializePresets(m_ucBitmap, m_nWidth, m_nHeight);
+}
+
 
 //-------------------------------------------------
 // Get the red value
@@ -242,12 +241,16 @@ int ImpressionistDoc::loadImage(char *iname)
 	// release old storage
 	if ( m_ucBitmap ) delete [] m_ucBitmap;
 	if ( m_ucPainting ) delete [] m_ucPainting;
+	if (m_ucAnotherImage) delete[] m_ucAnotherImage;
 
 	m_ucBitmap		= data;
 
 	// allocate space for draw view
 	m_ucPainting	= new unsigned char [width*height*3];
 	memset(m_ucPainting, 0, width*height*3);
+
+	m_ucAnotherImage = nullptr;
+	m_isAnotherGradient = false;
 
 	m_pUI->m_mainWindow->resize(m_pUI->m_mainWindow->x(), 
 								m_pUI->m_mainWindow->y(), 
@@ -262,7 +265,7 @@ int ImpressionistDoc::loadImage(char *iname)
 	m_pUI->m_paintView->resizeWindow(width, height);	
 	m_pUI->m_paintView->refresh();
 
-	m_convolutionManager->initializePresets(m_ucBitmap, m_nWidth, m_nHeight);
+	updateConvolutionPresetImage(m_isAnotherGradient);
 
 	return 1;
 }
@@ -311,7 +314,7 @@ int ImpressionistDoc::swapContents() {
 	m_ucBitmap = temp;
 	m_pUI->m_origView->refresh();
 	m_pUI->m_paintView->refresh();
-	m_convolutionManager->initializePresets(m_ucBitmap, m_nWidth, m_nHeight);
+	updateConvolutionPresetImage(m_isAnotherGradient);
 	return 1;
 }
 
@@ -339,7 +342,32 @@ int ImpressionistDoc::changeImage(char* iname) {
 	m_pUI->m_origView->resizeWindow(width, height);
 	m_pUI->m_origView->refresh();
 
-	m_convolutionManager->initializePresets(m_ucBitmap, m_nWidth, m_nHeight);
+	updateConvolutionPresetImage(m_isAnotherGradient);
+
+	return 1;
+}
+
+int ImpressionistDoc::loadAnotherImage(char* name) {
+	// try to open the image to read
+	unsigned char* data;
+	int width, height;
+
+	if ((data = readBMP(name, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	if (m_nWidth != width || m_nHeight != height) {
+		fl_alert("Another image should have the same dimension");
+		return 0;
+	}
+
+	// release old storage
+	if (m_ucAnotherImage) delete[] m_ucAnotherImage;
+	m_ucAnotherImage = data;
+
+	updateConvolutionPresetImage(m_isAnotherGradient);
 
 	return 1;
 }
