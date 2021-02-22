@@ -181,10 +181,14 @@ void ImpressionistUI::cb_load_image(Fl_Menu_* o, void* v)
 	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName() );
 	if (newfile != NULL) {
 		if (pDoc->loadImage(newfile) == 1) {
-			whoami(o)->m_isAnotherActivated = false;
-			whoami(o)->m_isAnotherGradient = false;
+			whoami(o)->m_isAnotherImageLoaded = false;
+			whoami(o)->m_isUsingAnotherGradient = false;
 			whoami(o)->m_anotherGradientLightButton->value(0);
 			whoami(o)->m_anotherGradientLightButton->deactivate();
+			whoami(o)->m_isEdgeImageLoaded = false;
+			whoami(o)->m_isEdgeClippingOn= false;
+			whoami(o)->m_edgeClipLightButton->value(0);
+			whoami(o)->m_edgeClipLightButton->deactivate();
 		}
 	}
 }
@@ -246,7 +250,7 @@ void ImpressionistUI::cb_load_another_image(Fl_Menu_* o, void* v) {
 	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
 	if (newfile != NULL) {
 		if (pDoc->loadAnotherImage(newfile) == 1) {
-			whoami(o)->m_isAnotherActivated = true;
+			whoami(o)->m_isAnotherImageLoaded = true;
 			if(whoami(o)->m_brushType == BRUSH_LINES || whoami(o)->m_brushType == BRUSH_SCATTERED_LINES)
 				whoami(o)->m_anotherGradientLightButton->activate();
 			else
@@ -255,6 +259,21 @@ void ImpressionistUI::cb_load_another_image(Fl_Menu_* o, void* v) {
 
 	}
 	
+}
+
+void ImpressionistUI::cb_load_edge_image(Fl_Menu_* o, void* v) {
+	ImpressionistDoc* pDoc = whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		if (pDoc->loadEdgeImage(newfile) == 1) {
+			whoami(o)->m_isEdgeImageLoaded = true;
+			if (whoami(o)->m_brushType == BRUSH_LINES || whoami(o)->m_brushType == BRUSH_SCATTERED_LINES)
+				whoami(o)->m_edgeClipLightButton->activate();
+			else
+				whoami(o)->m_edgeClipLightButton->deactivate();
+		}
+	}
 }
 
 //------------------------------------------------------------
@@ -310,16 +329,21 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 		pUI->m_strokeDirectionChoice->activate();
 		pUI->m_LineWidthSlider->activate();
 		pUI->m_LineAngleSlider->activate();
-		if (pUI->m_isAnotherActivated)
+		if (pUI->m_isAnotherImageLoaded)
 			pUI->m_anotherGradientLightButton->activate();
 		else
 			pUI->m_anotherGradientLightButton->deactivate();
+		if (pUI->m_isEdgeImageLoaded)
+			pUI->m_edgeClipLightButton->activate();
+		else
+			pUI->m_edgeClipLightButton->deactivate();
 	}
 	else {
 		pUI->m_strokeDirectionChoice->deactivate();
 		pUI->m_LineWidthSlider->deactivate();
 		pUI->m_LineAngleSlider->deactivate();
 		pUI->m_anotherGradientLightButton->deactivate();
+		pUI->m_edgeClipLightButton->deactivate();
 	}
 }
 
@@ -389,8 +413,14 @@ void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
 
 void ImpressionistUI::cb_another_gradient_light_button(Fl_Widget* o, void* v) {
 	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
-	pUI->m_isAnotherGradient = !pUI->m_isAnotherGradient;
-	pUI->getDocument()->updateConvolutionPresetImage(pUI->m_isAnotherGradient);
+	pUI->m_isUsingAnotherGradient = !pUI->m_isUsingAnotherGradient;
+	pUI->getDocument()->updateConvolutionPresetImage(pUI->m_isUsingAnotherGradient);
+}
+
+void ImpressionistUI::cb_edge_clip_light_button(Fl_Widget* o, void* v) {
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	pUI->m_isEdgeClippingOn = !pUI->m_isEdgeClippingOn;
+	pUI->getDocument()->setEdgeClipping(pUI->m_isEdgeClippingOn);
 }
 
 //-----------------------------------------------------------
@@ -640,8 +670,9 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_clear_canvas , 0, FL_MENU_DIVIDER },
 		{ "&Colors...", FL_ALT + 'k', (Fl_Callback *)ImpressionistUI::cb_colors, 0, FL_MENU_DIVIDER },
 		{ "S&wap contents", FL_ALT + 'w', (Fl_Callback *)ImpressionistUI::cb_swap_contents,},
-		{ "Change &mural image", FL_ALT + 'm', (Fl_Callback*)ImpressionistUI::cb_change_image, 0, FL_MENU_DIVIDER },
-		{ "Load a&nother image...", FL_ALT + 'n', (Fl_Callback*)ImpressionistUI::cb_load_another_image, 0, FL_MENU_DIVIDER },
+		{ "Change &mural image", FL_ALT + 'm', (Fl_Callback*)ImpressionistUI::cb_change_image},
+		{ "Load a&nother image...", FL_ALT + 'n', (Fl_Callback*)ImpressionistUI::cb_load_another_image},
+		{ "Load &edge image...", FL_ALT + 'e', (Fl_Callback*)ImpressionistUI::cb_load_edge_image, 0, FL_MENU_DIVIDER },
 		{ "&Filters...", FL_ALT + 'f', (Fl_Callback*)ImpressionistUI::cb_filters, 0, FL_MENU_DIVIDER },
 
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
@@ -726,8 +757,10 @@ ImpressionistUI::ImpressionistUI() {
 	m_brushWidth = 1;
 	m_angle = 0;
 	m_alpha = 255;
-	m_isAnotherGradient = false;
-	m_isAnotherActivated = false;
+	m_isUsingAnotherGradient = false;
+	m_isAnotherImageLoaded = false;
+	m_isEdgeClippingOn = false;
+	m_isEdgeImageLoaded = false;
 
 	m_redVal = 1.0;
 	m_greenVal = 1.0;
@@ -806,11 +839,17 @@ ImpressionistUI::ImpressionistUI() {
 		m_AlphaSlider->align(FL_ALIGN_RIGHT);
 		m_AlphaSlider->callback(cb_alphaSlides);
 
-		m_anotherGradientLightButton = new Fl_Light_Button(50, 210, 150, 25, "&Another gradient");
+		m_anotherGradientLightButton = new Fl_Light_Button(25, 210, 150, 25, "&Another gradient");
 		m_anotherGradientLightButton->user_data((void*)(this));   // record self to be used by static callback functions
 		m_anotherGradientLightButton->value(0);
 		m_anotherGradientLightButton->callback(cb_another_gradient_light_button);
 		m_anotherGradientLightButton->deactivate();
+
+		m_edgeClipLightButton = new Fl_Light_Button(225, 210, 150, 25, "&Edge clipping");
+		m_edgeClipLightButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_edgeClipLightButton->value(0);
+		m_edgeClipLightButton->callback(cb_edge_clip_light_button);
+		m_edgeClipLightButton->deactivate();
 
     m_brushDialog->end();	
 

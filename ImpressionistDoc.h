@@ -28,6 +28,8 @@ public:
 	int swapContents();
 	int changeImage(char* name);
 	int loadAnotherImage(char* name);
+	int loadEdgeImage(char* name);
+
 	int applyFilter(int filterType, int filterSource, bool isNormalized);
 	int applyCustomFilter(int kernel[], int width, int height, int filterSource, bool isNormalized);
 
@@ -42,6 +44,7 @@ public:
 	int 	getAlpha();						// get the alpha value
 	void	setAlpha(int alpha);			// set the alpha value
 	void updateConvolutionPresetImage(bool isAnotherImage);
+	void setEdgeClipping(bool isEdgeClippingOn);
 
 	double	getRedVal();				
 	void	setRedVal(double R);
@@ -65,10 +68,12 @@ private:
 	unsigned char*	m_ucBitmap;
 	unsigned char*	m_ucPainting;
 	unsigned char* m_ucAnotherImage;
+	unsigned char* m_ucEdgeImage;
 public:
-	unsigned char* getBitmap() { return m_ucBitmap; }
-	unsigned char* getPainting() { return m_ucPainting; }
-	unsigned char* getAnotherImage() { return m_ucAnotherImage; }
+	unsigned char* getBitmap();
+	unsigned char* getPainting();
+	unsigned char* getAnotherImage();
+	unsigned char* getEdgeImage();
 
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
@@ -77,7 +82,8 @@ public:
 	int m_brushWidth;
 	int m_angle;
 	int m_alpha;
-	bool m_isAnotherGradient;
+	bool m_isUsingAnotherGradient;
+	bool m_isEdgeClippingOn;
 
 	double	m_redVal;
 	double	m_greenVal;
@@ -93,6 +99,8 @@ public:
 	GLubyte* GetOriginalPixel( int x, int y );   
 	// Get the color of the original picture at the specified point	
 	GLubyte* GetOriginalPixel( const Point p );  
+	
+	GLubyte* getEdgePixel(int x, int y);  
 
 
 private:

@@ -18,6 +18,7 @@
 #define RIGHT_MOUSE_DOWN	4
 #define RIGHT_MOUSE_DRAG	5
 #define RIGHT_MOUSE_UP		6
+#define MOUSE_MOVE_			7
 
 
 #ifndef WIN32
@@ -111,34 +112,41 @@ void PaintView::draw()
 		case LEFT_MOUSE_DOWN:
 			m_pDoc->m_pCurrentBrush->BrushBegin( source, target );
 			m_pDoc->m_pUI->m_marker->update(source);
-			m_pDoc->m_pUI->m_origView->m_isMarkerVisible = true;
 			m_pDoc->m_pUI->m_origView->refresh();
 			break;
 		case LEFT_MOUSE_DRAG:
 			m_pDoc->m_pCurrentBrush->BrushMove( source, target );
 			m_pDoc->m_pUI->m_marker->update(source);
-			m_pDoc->m_pUI->m_origView->m_isMarkerVisible = true;
 			m_pDoc->m_pUI->m_origView->refresh();
 			break;
 		case LEFT_MOUSE_UP:
 			m_pDoc->m_pCurrentBrush->BrushEnd( source, target );
-			m_pDoc->m_pUI->m_origView->m_isMarkerVisible = false;
+			m_pDoc->m_pUI->m_marker->update(source);
 			m_pDoc->m_pUI->m_origView->refresh();
 			SaveCurrentContent();
 			RestoreContent();
 			break;
 		case RIGHT_MOUSE_DOWN:
 			m_pDoc->m_pUI->m_lineOverlay->setStart(target);
+			m_pDoc->m_pUI->m_marker->update(source);
+			m_pDoc->m_pUI->m_origView->refresh();
 			break;
 		case RIGHT_MOUSE_DRAG:
 			RestoreContent();
 			m_pDoc->m_pUI->m_lineOverlay->draw(target);
+			m_pDoc->m_pUI->m_marker->update(source);
+			m_pDoc->m_pUI->m_origView->refresh();
 			break;
 		case RIGHT_MOUSE_UP:
 			m_pDoc->m_pUI->m_lineOverlay->release(target);
 			RestoreContent();
+			m_pDoc->m_pUI->m_marker->update(source);
+			m_pDoc->m_pUI->m_origView->refresh();
 			break;
-
+		case MOUSE_MOVE_:
+			m_pDoc->m_pUI->m_marker->update(source);
+			m_pDoc->m_pUI->m_origView->refresh();
+			break;
 		default:
 			printf("Unknown event!!\n");		
 			break;
@@ -176,6 +184,10 @@ int PaintView::handle(int event)
 	switch(event)
 	{
 	case FL_ENTER:
+		coord.x = Fl::event_x();
+		coord.y = Fl::event_y();
+		eventToDo = MOUSE_MOVE_;
+		isAnEvent = 1;
 	    redraw();
 		break;
 	case FL_PUSH:
@@ -211,6 +223,9 @@ int PaintView::handle(int event)
 	case FL_MOVE:
 		coord.x = Fl::event_x();
 		coord.y = Fl::event_y();
+		eventToDo = MOUSE_MOVE_;
+		isAnEvent = 1;
+		redraw();
 		break;
 	default:
 		return 0;

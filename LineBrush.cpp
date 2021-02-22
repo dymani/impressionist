@@ -108,19 +108,44 @@ int LineBrush::angleRegression() {
 		return int(atan2(sXY, sX2) * 180 / PI);
 }
 
-
 void LineBrush::drawLine(const Point source, const Point target) {
 	ImpressionistDoc* pDoc = GetDocument();
-
-	glBegin(GL_TRIANGLE_STRIP);
-		SetColor(source, pDoc->getAlpha());
+	if (pDoc->m_isEdgeClippingOn) {
+		GLubyte color[3];
+		memcpy(color, pDoc->getEdgePixel(source.x, source.y), 3);
 		double sinT = sin(m_angle * PI / 180);
 		double cosT = cos(m_angle * PI / 180);
-		double x = m_size / 2.0;
 		double y = m_width / 2.0;
-		glVertex2d(target.x + x * cosT - y * sinT, target.y + x * sinT + y * cosT);
-		glVertex2d(target.x - x * cosT - y * sinT, target.y - x * sinT + y * cosT);
-		glVertex2d(target.x + x * cosT + y * sinT, target.y + x * sinT - y * cosT);
-		glVertex2d(target.x - x * cosT + y * sinT, target.y - x * sinT - y * cosT);
-	glEnd();
+		glBegin(GL_QUAD_STRIP);
+			SetColor(source, pDoc->getAlpha());
+			for (double i = 0; i <= m_size / 2; ++i) {
+				if (!isEqual(color, pDoc->getEdgePixel(source.x - i * cosT, source.y - i * sinT)))
+					break;
+				glVertex2d(target.x - i * cosT + y * sinT, target.y - i * sinT - y * cosT);
+				glVertex2d(target.x - i * cosT - y * sinT, target.y - i * sinT + y * cosT);
+			}
+		glEnd();
+		glBegin(GL_QUAD_STRIP);
+			SetColor(source, pDoc->getAlpha());
+			for (double i = 0; i <= m_size / 2; ++i) {
+				if (!isEqual(color, pDoc->getEdgePixel(source.x + i * cosT, source.y + i * sinT)))
+					break;
+				glVertex2d(target.x + i * cosT + y * sinT, target.y + i * sinT - y * cosT);
+				glVertex2d(target.x + i * cosT - y * sinT, target.y + i * sinT + y * cosT);
+			}
+		glEnd();
+	}
+	else {
+		glBegin(GL_TRIANGLE_STRIP);
+			SetColor(source, pDoc->getAlpha());
+			double sinT = sin(m_angle * PI / 180);
+			double cosT = cos(m_angle * PI / 180);
+			double x = m_size / 2.0;
+			double y = m_width / 2.0;
+			glVertex2d(target.x + x * cosT - y * sinT, target.y + x * sinT + y * cosT);
+			glVertex2d(target.x - x * cosT - y * sinT, target.y - x * sinT + y * cosT);
+			glVertex2d(target.x + x * cosT + y * sinT, target.y + x * sinT - y * cosT);
+			glVertex2d(target.x - x * cosT + y * sinT, target.y - x * sinT - y * cosT);
+		glEnd();
+	}
 }

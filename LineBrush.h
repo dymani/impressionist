@@ -2,6 +2,7 @@
 #define LINE_BRUSH_H
 
 #include "ImpBrush.h"
+#include <FL/Fl.H>
 
 #include <vector>
 
@@ -28,6 +29,9 @@ protected:
 	Mode m_mode;
 	const unsigned int MOUSE_HISTORY_SIZE = 5;
 	std::vector<Point> m_prevTargets;
+	inline bool isEqual(unsigned char* left, unsigned char* right) {
+		return left[0] == right[0] && left[1] == right[1] && left[2] == right[2];
+	}
 };
 
 #endif

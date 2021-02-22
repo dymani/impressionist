@@ -22,7 +22,6 @@ OriginalView::OriginalView(int			x,
 {
 	m_nWindowWidth	= w;
 	m_nWindowHeight	= h;
-	m_isMarkerVisible = false;
 
 }
 
@@ -77,8 +76,7 @@ void OriginalView::draw()
 		glDrawBuffer( GL_BACK );
 		glDrawPixels( drawWidth, drawHeight, GL_RGB, GL_UNSIGNED_BYTE, bitstart );
 
-		if (m_isMarkerVisible)
-			m_pDoc->m_pUI->m_marker->draw(m_nWindowHeight - drawHeight);
+		m_pDoc->m_pUI->m_marker->draw(m_nWindowHeight - drawHeight);
 
 	}
 			
