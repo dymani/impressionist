@@ -27,6 +27,7 @@ public:
 	int     clearCanvas();                  // called by the UI to clear the drawing canvas
 	int swapContents();
 	int changeImage(char* name);
+	int loadAnotherImage(char* name);
 	int applyFilter(int filterType, int filterSource, bool isNormalized);
 	int applyCustomFilter(int kernel[], int width, int height, int filterSource, bool isNormalized);
 
@@ -40,6 +41,8 @@ public:
 	void	setAngle(int angle);			// set the line angle
 	int 	getAlpha();						// get the alpha value
 	void	setAlpha(int alpha);			// set the alpha value
+	void updateConvolutionPresetImage(bool isAnotherImage);
+
 	double	getRedVal();				
 	void	setRedVal(double R);
 	double	getGreenVal();
@@ -61,9 +64,11 @@ public:
 private:
 	unsigned char*	m_ucBitmap;
 	unsigned char*	m_ucPainting;
+	unsigned char* m_ucAnotherImage;
 public:
 	unsigned char* getBitmap() { return m_ucBitmap; }
 	unsigned char* getPainting() { return m_ucPainting; }
+	unsigned char* getAnotherImage() { return m_ucAnotherImage; }
 
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
@@ -71,7 +76,8 @@ public:
 	int m_nSize;	
 	int m_brushWidth;
 	int m_angle;
-	int m_alpha;			
+	int m_alpha;
+	bool m_isAnotherGradient;
 
 	double	m_redVal;
 	double	m_greenVal;

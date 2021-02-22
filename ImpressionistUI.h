@@ -51,6 +51,8 @@ public:
 	Fl_Slider*			m_LineAngleSlider;
 	Fl_Slider*			m_AlphaSlider;
 
+	Fl_Light_Button* m_anotherGradientLightButton;
+
 	Fl_Button*          m_ClearCanvasButton;
 
 // for color dialog
@@ -84,21 +86,25 @@ public:
 	void				setAngle(int angle);
 	int					getAlpha();
 	void				setAlpha(int alpha);
+	
 	double				getRedVal();
 	void				setRedVal(double R);
 	double				getGreenVal();
 	void				setGreenVal(double G);
 	double				getBlueVal();
 	void				setBlueVal(double B);
-
+	
 private:
 	ImpressionistDoc*	m_pDoc;		// pointer to document to communicate with the document
 
 	// All attributes here
+	int m_brushType;
 	int		m_nSize;
 	int		m_brushWidth;
 	int		m_angle;
 	int		m_alpha;
+	bool m_isAnotherGradient;
+	bool m_isAnotherActivated;
 
 	double	m_redVal;
 	double	m_greenVal;
@@ -128,6 +134,7 @@ private:
 	static void cb_colors(Fl_Menu_* o, void* v);
 	static void	cb_swap_contents(Fl_Menu_* o, void* v);
 	static void cb_change_image(Fl_Menu_* o, void* v);
+	static void cb_load_another_image(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
 	static void	cb_filters(Fl_Menu_* o, void* v);
@@ -139,6 +146,7 @@ private:
 	static void cb_widthSlides(Fl_Widget* o, void* v);
 	static void cb_angleSlides(Fl_Widget* o, void* v);
 	static void cb_alphaSlides(Fl_Widget* o, void* v);
+	static void cb_another_gradient_light_button(Fl_Widget* o, void* v);
 
 	static void cb_color_chooser(Fl_Widget* o, void* v);
 

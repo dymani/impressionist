@@ -180,7 +180,12 @@ void ImpressionistUI::cb_load_image(Fl_Menu_* o, void* v)
 
 	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName() );
 	if (newfile != NULL) {
-		pDoc->loadImage(newfile);
+		if (pDoc->loadImage(newfile) == 1) {
+			whoami(o)->m_isAnotherActivated = false;
+			whoami(o)->m_isAnotherGradient = false;
+			whoami(o)->m_anotherGradientLightButton->value(0);
+			whoami(o)->m_anotherGradientLightButton->deactivate();
+		}
 	}
 }
 
@@ -235,6 +240,23 @@ void ImpressionistUI::cb_change_image(Fl_Menu_* o, void* v) {
 	}
 }
 
+void ImpressionistUI::cb_load_another_image(Fl_Menu_* o, void* v) {
+	ImpressionistDoc* pDoc = whoami(o)->getDocument();
+
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		if (pDoc->loadAnotherImage(newfile) == 1) {
+			whoami(o)->m_isAnotherActivated = true;
+			if(whoami(o)->m_brushType == BRUSH_LINES || whoami(o)->m_brushType == BRUSH_SCATTERED_LINES)
+				whoami(o)->m_anotherGradientLightButton->activate();
+			else
+				whoami(o)->m_anotherGradientLightButton->deactivate();
+		}
+
+	}
+	
+}
+
 //------------------------------------------------------------
 // Causes the Impressionist program to exit
 // Called by the UI when the quit menu item is chosen
@@ -278,10 +300,27 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 	ImpressionistUI* pUI=((ImpressionistUI *)(o->user_data()));
 	ImpressionistDoc* pDoc=pUI->getDocument();
 
-	int type=(int)v;
+	pUI->m_brushType =(int)v;
 
 
-	pDoc->setBrushType(type);
+	pDoc->setBrushType(pUI->m_brushType);
+
+	// Check if certain attributes are available for certain brush types
+	if (pUI->m_brushType == BRUSH_LINES || pUI->m_brushType == BRUSH_SCATTERED_LINES) {
+		pUI->m_strokeDirectionChoice->activate();
+		pUI->m_LineWidthSlider->activate();
+		pUI->m_LineAngleSlider->activate();
+		if (pUI->m_isAnotherActivated)
+			pUI->m_anotherGradientLightButton->activate();
+		else
+			pUI->m_anotherGradientLightButton->deactivate();
+	}
+	else {
+		pUI->m_strokeDirectionChoice->deactivate();
+		pUI->m_LineWidthSlider->deactivate();
+		pUI->m_LineAngleSlider->deactivate();
+		pUI->m_anotherGradientLightButton->deactivate();
+	}
 }
 
 //------------------------------------------------------------
@@ -346,6 +385,12 @@ void ImpressionistUI::cb_alphaSlides(Fl_Widget* o, void* v)
 {
 	int convert = (int)(((Fl_Slider*)o)->value() * 255);
 	((ImpressionistUI*)(o->user_data()))->m_alpha = int(convert);
+}
+
+void ImpressionistUI::cb_another_gradient_light_button(Fl_Widget* o, void* v) {
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	pUI->m_isAnotherGradient = !pUI->m_isAnotherGradient;
+	pUI->getDocument()->updateConvolutionPresetImage(pUI->m_isAnotherGradient);
 }
 
 //-----------------------------------------------------------
@@ -596,6 +641,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Colors...", FL_ALT + 'k', (Fl_Callback *)ImpressionistUI::cb_colors, 0, FL_MENU_DIVIDER },
 		{ "S&wap contents", FL_ALT + 'w', (Fl_Callback *)ImpressionistUI::cb_swap_contents,},
 		{ "Change &mural image", FL_ALT + 'm', (Fl_Callback*)ImpressionistUI::cb_change_image, 0, FL_MENU_DIVIDER },
+		{ "Load a&nother image...", FL_ALT + 'n', (Fl_Callback*)ImpressionistUI::cb_load_another_image, 0, FL_MENU_DIVIDER },
 		{ "&Filters...", FL_ALT + 'f', (Fl_Callback*)ImpressionistUI::cb_filters, 0, FL_MENU_DIVIDER },
 
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
@@ -680,6 +726,9 @@ ImpressionistUI::ImpressionistUI() {
 	m_brushWidth = 1;
 	m_angle = 0;
 	m_alpha = 255;
+	m_isAnotherGradient = false;
+	m_isAnotherActivated = false;
+
 	m_redVal = 1.0;
 	m_greenVal = 1.0;
 	m_blueVal = 1.0;
@@ -756,6 +805,12 @@ ImpressionistUI::ImpressionistUI() {
 		m_AlphaSlider->value(1);
 		m_AlphaSlider->align(FL_ALIGN_RIGHT);
 		m_AlphaSlider->callback(cb_alphaSlides);
+
+		m_anotherGradientLightButton = new Fl_Light_Button(50, 210, 150, 25, "&Another gradient");
+		m_anotherGradientLightButton->user_data((void*)(this));   // record self to be used by static callback functions
+		m_anotherGradientLightButton->value(0);
+		m_anotherGradientLightButton->callback(cb_another_gradient_light_button);
+		m_anotherGradientLightButton->deactivate();
 
     m_brushDialog->end();	
 
