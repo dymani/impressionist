@@ -316,6 +316,7 @@ int ImpressionistDoc::loadImage(char *iname)
 int ImpressionistDoc::saveImage(char *iname) 
 {
 
+	if (!m_ucBitmap) return 0;
 	writeBMP(iname, m_nPaintWidth, m_nPaintHeight, m_ucPainting);
 
 	return 1;
@@ -346,6 +347,7 @@ int ImpressionistDoc::clearCanvas()
 }
 
 int ImpressionistDoc::swapContents() {
+	if (!m_ucBitmap) return 0;
 	unsigned char* temp = m_ucPainting;
 	m_ucPainting = m_ucBitmap;
 	m_ucBitmap = temp;
@@ -356,6 +358,10 @@ int ImpressionistDoc::swapContents() {
 }
 
 int ImpressionistDoc::changeImage(char* iname) {
+	if (!m_ucBitmap) { 
+		fl_alert("Please load an image first");
+		return 0;
+	}
 	// try to open the image to read
 	unsigned char* data;
 	int width,height;
@@ -385,6 +391,10 @@ int ImpressionistDoc::changeImage(char* iname) {
 }
 
 int ImpressionistDoc::loadAnotherImage(char* name) {
+	if (!m_ucBitmap) {
+		fl_alert("Please load an image first");
+		return 0;
+	}
 	// try to open the image to read
 	unsigned char* data;
 	int width, height;
@@ -410,6 +420,10 @@ int ImpressionistDoc::loadAnotherImage(char* name) {
 }
 
 int ImpressionistDoc::loadEdgeImage(char* name) {
+	if (!m_ucBitmap) {
+		fl_alert("Please load an image first");
+		return 0;
+	}
 	// try to open the image to read
 	unsigned char* data;
 	int width, height;
@@ -433,6 +447,7 @@ int ImpressionistDoc::loadEdgeImage(char* name) {
 }
 
 int ImpressionistDoc::applyFilter(int filterType, int filterSource, bool isNormalized) {
+	if (!m_ucBitmap) return 0;
 	if (!m_ucBitmap)
 		return 0;
 	
