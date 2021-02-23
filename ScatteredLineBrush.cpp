@@ -49,12 +49,12 @@ void ScatteredLineBrush::BrushMove(const Point source, const Point target) {
 		if (pDoc->m_isEdgeClippingOn) {
 			double lim1 = 0, lim2 = 0;
 			for (double j = 0; j <= m_size / 2; ++j) {
-				if (!isEqual(color, pDoc->getEdgePixel(source.x - j * cosT, source.y - j * sinT)))
+				if (!isEqual(color, pDoc->getEdgePixel(int(source.x - j * cosT), int(source.y - j * sinT))))
 					break;
 				lim1 = -j;
 			}
 			for (double j = 0; j <= m_size / 2; ++j) {
-				if (!isEqual(color, pDoc->getEdgePixel(source.x + j * cosT, source.y + j * sinT)))
+				if (!isEqual(color, pDoc->getEdgePixel(int(source.x + j * cosT), int(source.y + j * sinT))))
 					break;
 				lim2 = j;
 			}

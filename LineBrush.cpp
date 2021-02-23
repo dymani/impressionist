@@ -119,7 +119,7 @@ void LineBrush::drawLine(const Point source, const Point target) {
 		glBegin(GL_QUAD_STRIP);
 			SetColor(source, pDoc->getAlpha());
 			for (double i = 0; i <= m_size / 2; ++i) {
-				if (!isEqual(color, pDoc->getEdgePixel(source.x - i * cosT, source.y - i * sinT)))
+				if (!isEqual(color, pDoc->getEdgePixel(int(source.x - i * cosT), int(source.y - i * sinT))))
 					break;
 				glVertex2d(target.x - i * cosT + y * sinT, target.y - i * sinT - y * cosT);
 				glVertex2d(target.x - i * cosT - y * sinT, target.y - i * sinT + y * cosT);
@@ -128,7 +128,7 @@ void LineBrush::drawLine(const Point source, const Point target) {
 		glBegin(GL_QUAD_STRIP);
 			SetColor(source, pDoc->getAlpha());
 			for (double i = 0; i <= m_size / 2; ++i) {
-				if (!isEqual(color, pDoc->getEdgePixel(source.x + i * cosT, source.y + i * sinT)))
+				if (!isEqual(color, pDoc->getEdgePixel(int(source.x + i * cosT), int(source.y + i * sinT))))
 					break;
 				glVertex2d(target.x + i * cosT + y * sinT, target.y + i * sinT - y * cosT);
 				glVertex2d(target.x + i * cosT - y * sinT, target.y + i * sinT + y * cosT);

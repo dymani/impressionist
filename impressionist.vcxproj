@@ -160,6 +160,7 @@
     <ClCompile Include="Marker.cpp" />
     <ClCompile Include="InputTable.cpp" />
     <ClCompile Include="SharpenBrush.cpp" />
+    <ClCompile Include="WarpBrush.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
@@ -183,6 +184,7 @@
     <ClInclude Include="ScatteredCircleBrush.h" />
     <ClInclude Include="ScatteredLineBrush.h" />
     <ClInclude Include="ScatteredPointBrush.h" />
+    <ClInclude Include="WarpBrush.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
