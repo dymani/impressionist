@@ -22,6 +22,7 @@
     <ClCompile Include="ConvolutionManager.cpp" />
     <ClCompile Include="SharpenBrush.cpp" />
     <ClCompile Include="BlurBrush.cpp" />
+    <ClCompile Include="WarpBrush.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
@@ -45,5 +46,6 @@
     <ClInclude Include="ConvolutionManager.h" />
     <ClInclude Include="SharpenBrush.h" />
     <ClInclude Include="BlurBrush.h" />
+    <ClInclude Include="WarpBrush.h" />
   </ItemGroup>
 </Project>

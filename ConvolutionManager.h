@@ -5,6 +5,8 @@
 
 namespace Kernel {
 
+	const double PI = 3.14159265358;
+
 	static const int GAUSSIAN_3[] = { 1, 2, 1, 2, 4, 2, 1, 2, 1 };
 	static const int GAUSSIAN_5[] = { 1, 4, 7, 4, 1,
 											  4, 16, 26, 16, 4,
@@ -14,6 +16,8 @@ namespace Kernel {
 	static const int SOBEL_X[] = { -1, 0, 1, -2, 0, 2, -1, 0, 1 };
 	static const int SOBEL_Y[] = { 1, 2, 1, 0, 0, 0, -1, -2, -1 };
 	static const int SHARPEN[] = { 0, -1, 0, -1, 5, -1, 0, -1, 0};
+
+	double* generateGaussian(int size, float sigma);
 }
 
 class ConvolutionManager {

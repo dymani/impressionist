@@ -143,8 +143,6 @@ void PaintView::draw()
 			m_pDoc->m_pUI->m_origView->refresh();
 			break;
 		case MOUSE_MOVE_:
-			m_pDoc->m_pUI->m_marker->update(source);
-			m_pDoc->m_pUI->m_origView->refresh();
 			break;
 		default:
 			printf("Unknown event!!\n");		
@@ -180,15 +178,10 @@ void PaintView::draw()
 
 int PaintView::handle(int event)
 {
-	if (!isAnEvent) {
-		switch (event)
+
+	switch (event)
 		{
 		case FL_ENTER:
-			coord.x = Fl::event_x();
-			coord.y = Fl::event_y();
-			eventToDo = MOUSE_MOVE_;
-			isAnEvent = 1;
-			redraw();
 			break;
 		case FL_PUSH:
 			coord.x = Fl::event_x();
@@ -210,13 +203,6 @@ int PaintView::handle(int event)
 			isAnEvent = 1;
 			redraw();
 			break;
-		case FL_MOVE:
-			coord.x = Fl::event_x();
-			coord.y = Fl::event_y();
-			eventToDo = MOUSE_MOVE_;
-			isAnEvent = 1;
-			redraw();
-			break;
 		case FL_RELEASE:
 			coord.x = Fl::event_x();
 			coord.y = Fl::event_y();
@@ -227,12 +213,27 @@ int PaintView::handle(int event)
 			isAnEvent = 1;
 			redraw();
 			break;
+		case FL_MOVE:
+			coord.x = Fl::event_x();
+			coord.y = Fl::event_y();
+			{
+				int drawWidth, drawHeight;
+				drawWidth = min(m_nWindowWidth, m_pDoc->m_nPaintWidth);
+				drawHeight = min(m_nWindowHeight, m_pDoc->m_nPaintHeight);
+
+				int startrow = m_pDoc->m_nPaintHeight - (drawHeight);
+				if (startrow < 0) startrow = 0;
+
+				Point source(coord.x, startrow + drawHeight - coord.y);
+				m_pDoc->m_pUI->m_marker->update(source);
+				m_pDoc->m_pUI->m_origView->refresh();
+			}			
+			break;
 		default:
 			return 0;
 			break;
 
 		}
-	}
 
 
 	return 1;

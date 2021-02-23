@@ -36,7 +36,7 @@ void InputTable::beginEditing(int r, int c) {
     find_cell(CONTEXT_CELL, r, c, x, y, w, h);
     m_input->resize(x, y, w, h);
     char s[30];
-    sprintf(s, "%d", m_values[r][c]);
+    sprintf_s(s, "%d", m_values[r][c]);
     m_input->value(s);
     m_input->position(0, strlen(s));
     m_input->show();
@@ -59,7 +59,7 @@ void InputTable::draw_cell(TableContext context, int r, int c, int x, int y, int
         fl_push_clip(x, y, w, h);
         fl_draw_box(FL_THIN_UP_BOX, x, y, w, h, col_header_color());
         fl_color(FL_BLACK);
-        sprintf(s, "%d", c + 1);
+        sprintf_s(s, "%d", c + 1);
         fl_draw(s, x, y, w, h, FL_ALIGN_CENTER);
         fl_pop_clip();
         return;
@@ -68,7 +68,7 @@ void InputTable::draw_cell(TableContext context, int r, int c, int x, int y, int
         fl_push_clip(x, y, w, h);
         fl_draw_box(FL_THIN_UP_BOX, x, y, w, h, row_header_color());
         fl_color(FL_BLACK);
-        sprintf(s, "%d", r + 1);
+        sprintf_s(s, "%d", r + 1);
         fl_draw(s, x, y, w, h, FL_ALIGN_CENTER);
         fl_pop_clip();
         return;
@@ -80,7 +80,7 @@ void InputTable::draw_cell(TableContext context, int r, int c, int x, int y, int
         fl_push_clip(x + 3, y + 3, w - 6, h - 6);
         fl_color(FL_BLACK);
         fl_font(FL_HELVETICA, 14);
-        sprintf(s, "%d", m_values[r][c]);
+        sprintf_s(s, "%d", m_values[r][c]);
         fl_draw(s, x + 3, y + 3, w - 6, h - 6, FL_ALIGN_RIGHT);
         fl_pop_clip();
         return;

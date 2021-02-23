@@ -22,6 +22,7 @@
 #include "RandomPolygonBrush.h"
 #include "SharpenBrush.h"
 #include "BlurBrush.h"
+#include "WarpBrush.h"
 
 #include "LineOverlay.h"
 #include "InputTable.h"
@@ -71,6 +72,8 @@ ImpressionistDoc::ImpressionistDoc()
 		= new SharpenBrush(this, "Sharpen");
 	ImpBrush::c_pBrushes[BRUSH_BLUR]
 		= new BlurBrush(this, "Blur");
+	ImpBrush::c_pBrushes[BRUSH_WARP]
+		= new WarpBrush(this, "Warp");
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];	
@@ -499,6 +502,20 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( int x, int y )
 GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 {
 	return GetOriginalPixel( p.x, p.y );
+}
+
+GLubyte* ImpressionistDoc::getPaintPixel(int x, int y) {
+	if (x < 0)
+		x = 0;
+	else if (x >= m_nWidth)
+		x = m_nWidth - 1;
+
+	if (y < 0)
+		y = 0;
+	else if (y >= m_nHeight)
+		y = m_nHeight - 1;
+
+	return (GLubyte*)(m_ucPainting + 3 * (y * m_nWidth + x));
 }
 
 

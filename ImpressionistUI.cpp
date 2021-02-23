@@ -352,6 +352,13 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 		//else
 			//pUI->m_edgeClipLightButton->deactivate();
 	}
+	else if (pUI->m_brushType == BRUSH_WARP) {
+		pUI->m_strokeDirectionChoice->deactivate();
+		pUI->m_LineWidthSlider->activate();
+		pUI->m_LineAngleSlider->deactivate();
+		pUI->m_anotherGradientLightButton->deactivate();
+		pUI->m_edgeClipLightButton->deactivate();
+	}
 	else {
 		pUI->m_strokeDirectionChoice->deactivate();
 		pUI->m_LineWidthSlider->deactivate();
@@ -730,6 +737,7 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Random Polygon",	FL_ALT+'r', (Fl_Callback *)ImpressionistUI::cb_brushChoice, (void *)BRUSH_RANDOM_POLYGON},
   {"Sharpen",	FL_ALT + 's', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_SHARPEN},
   {"Blur",	FL_ALT + 'u', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_BLUR},
+  {"Warp",	FL_ALT + 'w', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_WARP},
   {0}
 };
 

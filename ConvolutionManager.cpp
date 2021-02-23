@@ -1,6 +1,19 @@
 #include "ConvolutionManager.h"
 #include <cmath>
 
+double* Kernel::generateGaussian(int size, float sigma) {
+	double* result = new double[size * size];
+	int x, y;
+	for (int i = 0; i < size; ++i) {
+		for (int j = 0; j < size; ++j) {
+			x = i - size / 2;
+			y = j - size / 2;
+			result[i * size + j] = (1 / (2 * PI * sigma * sigma)) * exp(-(x * x + y * y) / (2 * sigma * sigma));
+		}
+	}
+	return result;
+}
+
 ConvolutionManager::ConvolutionManager() {
 	m_image = nullptr;
 	m_iWidth = m_iHeight = 0;
