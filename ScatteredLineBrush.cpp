@@ -50,7 +50,7 @@ void ScatteredLineBrush::BrushMove(const Point source, const Point target) {
 			for (double j = 0; j <= m_size / 2; ++j) {
 				if (!isEqual(color, pDoc->getEdgePixel(source.x - j * cosT, source.y - j * sinT)))
 					break;
-				lim1 = j;
+				lim1 = -j;
 			}
 			for (double j = 0; j <= m_size / 2; ++j) {
 				if (!isEqual(color, pDoc->getEdgePixel(source.x + j * cosT, source.y + j * sinT)))
@@ -58,7 +58,7 @@ void ScatteredLineBrush::BrushMove(const Point source, const Point target) {
 				lim2 = j;
 			}
 			double px = sx * cosT + sy * sinT;
-			if (px < -lim1 || px > lim2) {
+			if (px < lim1 + m_size / 4 || px > lim2 - m_size / 4) {
 				--i;
 				continue;
 			}

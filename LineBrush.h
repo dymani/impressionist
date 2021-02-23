@@ -30,7 +30,9 @@ protected:
 	const unsigned int MOUSE_HISTORY_SIZE = 5;
 	std::vector<Point> m_prevTargets;
 	inline bool isEqual(unsigned char* left, unsigned char* right) {
-		return left[0] == right[0] && left[1] == right[1] && left[2] == right[2];
+		return abs((int)left[0] - (int)right[0]) < 128
+			&& abs((int)left[1] - (int)right[1]) < 128
+			&& abs((int)left[2] - (int)right[2]) < 128;
 	}
 };
 

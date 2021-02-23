@@ -188,7 +188,7 @@ void ImpressionistUI::cb_load_image(Fl_Menu_* o, void* v)
 			whoami(o)->m_isEdgeImageLoaded = false;
 			whoami(o)->m_isEdgeClippingOn= false;
 			whoami(o)->m_edgeClipLightButton->value(0);
-			whoami(o)->m_edgeClipLightButton->deactivate();
+			// whoami(o)->m_edgeClipLightButton->deactivate();
 		}
 	}
 }
@@ -268,10 +268,10 @@ void ImpressionistUI::cb_load_edge_image(Fl_Menu_* o, void* v) {
 	if (newfile != NULL) {
 		if (pDoc->loadEdgeImage(newfile) == 1) {
 			whoami(o)->m_isEdgeImageLoaded = true;
-			if (whoami(o)->m_brushType == BRUSH_LINES || whoami(o)->m_brushType == BRUSH_SCATTERED_LINES)
+			/*if (whoami(o)->m_brushType == BRUSH_LINES || whoami(o)->m_brushType == BRUSH_SCATTERED_LINES)
 				whoami(o)->m_edgeClipLightButton->activate();
 			else
-				whoami(o)->m_edgeClipLightButton->deactivate();
+				whoami(o)->m_edgeClipLightButton->deactivate();*/
 		}
 	}
 }
@@ -333,10 +333,10 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 			pUI->m_anotherGradientLightButton->activate();
 		else
 			pUI->m_anotherGradientLightButton->deactivate();
-		if (pUI->m_isEdgeImageLoaded)
+		//if (pUI->m_isEdgeImageLoaded)
 			pUI->m_edgeClipLightButton->activate();
-		else
-			pUI->m_edgeClipLightButton->deactivate();
+		//else
+			//pUI->m_edgeClipLightButton->deactivate();
 	}
 	else {
 		pUI->m_strokeDirectionChoice->deactivate();
@@ -711,6 +711,7 @@ Fl_Menu_Item ImpressionistUI::filterTypeMenu[ConvolutionManager::NUM_FILTER_CHOI
   {"Gaussian 5x5", FL_ALT + 'h', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_GAUSSIAN_3},
   {"Sobel X", FL_ALT + 'x', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_SOBEL_X},
   {"Sobel Y", FL_ALT + 'y', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_SOBEL_Y},
+  {"Edge", FL_ALT + 'e', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_EDGE},
   {"Custom...", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_filter_type_choice, (void*)ConvolutionManager::FILTER_CUSTOM},
   {0}
 };

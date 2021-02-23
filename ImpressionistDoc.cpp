@@ -187,8 +187,8 @@ void ImpressionistDoc::updateConvolutionPresetImage(bool isAnotherImage) {
 }
 
 void ImpressionistDoc::setEdgeClipping(bool isEdgeClippingOn) {
-	if (!m_ucEdgeImage)
-		return;
+	/*if (!m_ucEdgeImage)
+		return;*/
 	m_isEdgeClippingOn = isEdgeClippingOn;
 }
 
@@ -496,8 +496,6 @@ GLubyte* ImpressionistDoc::GetOriginalPixel( const Point p )
 
 
 GLubyte* ImpressionistDoc::getEdgePixel(int x, int y) {
-	if (!m_ucEdgeImage)
-		return nullptr;
 	if (x < 0)
 		x = 0;
 	else if (x >= m_nWidth)
@@ -507,6 +505,8 @@ GLubyte* ImpressionistDoc::getEdgePixel(int x, int y) {
 		y = 0;
 	else if (y >= m_nHeight)
 		y = m_nHeight - 1;
-
-	return (GLubyte*)(m_ucEdgeImage+ 3 * (y * m_nWidth + x));
+	if (!m_ucEdgeImage) {
+		m_ucEdgeImage = m_convolutionManager->generateFilterImage(ConvolutionManager::FILTER_EDGE, m_ucBitmap, m_nWidth, m_nHeight, false);
+	}
+	return (GLubyte*)(m_ucEdgeImage + 3 * (y * m_nWidth + x));
 }
