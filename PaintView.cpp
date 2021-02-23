@@ -110,6 +110,7 @@ void PaintView::draw()
 		switch (eventToDo) 
 		{
 		case LEFT_MOUSE_DOWN:
+			saveUndo();
 			m_pDoc->m_pCurrentBrush->BrushBegin( source, target );
 			m_pDoc->m_pUI->m_marker->update(source);
 			m_pDoc->m_pUI->m_origView->refresh();
@@ -236,6 +237,14 @@ int PaintView::handle(int event)
 
 
 	return 1;
+}
+
+void PaintView::saveUndo()
+{
+	int size = m_pDoc->m_nPaintHeight * m_pDoc->m_nPaintWidth * 3;
+	delete[] m_pDoc->m_ucPaintingUndo;
+	m_pDoc->m_ucPaintingUndo = new unsigned char[size];
+	memcpy(m_pDoc->m_ucPaintingUndo, m_pDoc->getPainting(), size);
 }
 
 void PaintView::refresh()
