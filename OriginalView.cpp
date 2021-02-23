@@ -22,7 +22,13 @@ OriginalView::OriginalView(int			x,
 {
 	m_nWindowWidth	= w;
 	m_nWindowHeight	= h;
+	m_view = ORIGINAL;
 
+}
+
+void OriginalView::setView(View v) {
+	m_view = v;
+	refresh();
 }
 
 void OriginalView::draw()
@@ -53,7 +59,7 @@ void OriginalView::draw()
 		m_nWindowHeight=h();
 
 		int drawWidth, drawHeight;
-		GLvoid* bitstart;
+		GLvoid* bitstart = nullptr;
 
 		// we are not using a scrollable window, so ignore it
 		Point scrollpos;	// = GetScrollPosition();
@@ -66,16 +72,39 @@ void OriginalView::draw()
 		if ( startrow < 0 ) 
 			startrow = 0;
 
+		switch (m_view)
+		{
+			case OriginalView::ANOTHER:
+				if (m_pDoc->getAnotherImage())
+					bitstart = m_pDoc->getAnotherImage() + 3 * ((m_pDoc->m_nWidth * startrow) + scrollpos.x);
+				break;
+			case OriginalView::EDGE:
+				if (m_pDoc->getEdgeImage())
+					bitstart = m_pDoc->getEdgeImage() + 3 * ((m_pDoc->m_nWidth * startrow) + scrollpos.x);
+				break;
+			case OriginalView::ORIGINAL:
+			default:
+				bitstart = m_pDoc->getBitmap() + 3 * ((m_pDoc->m_nWidth * startrow) + scrollpos.x);
+				break;
+		}
 
-		bitstart = m_pDoc->getBitmap() + 3 * ((m_pDoc->m_nWidth * startrow) + scrollpos.x);
-
-		// just copy image to GLwindow conceptually
-		glRasterPos2i( 0, m_nWindowHeight - drawHeight );
-		glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-		glPixelStorei( GL_UNPACK_ROW_LENGTH, m_pDoc->m_nWidth );
-		glDrawBuffer( GL_BACK );
-		glDrawPixels( drawWidth, drawHeight, GL_RGB, GL_UNSIGNED_BYTE, bitstart );
-
+		if (bitstart) {
+			// just copy image to GLwindow conceptually
+			glRasterPos2i(0, m_nWindowHeight - drawHeight);
+			glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+			glPixelStorei(GL_UNPACK_ROW_LENGTH, m_pDoc->m_nWidth);
+			glDrawBuffer(GL_BACK);
+			glDrawPixels(drawWidth, drawHeight, GL_RGB, GL_UNSIGNED_BYTE, bitstart);
+		}
+		else {
+			glBegin(GL_QUADS);
+				glColor3ub(0, 0, 0);
+				glVertex2f(0, (float)m_nWindowHeight - drawHeight);
+				glVertex2f((float)m_pDoc->m_nWidth, (float)m_nWindowHeight - drawHeight);
+				glVertex2f((float)m_pDoc->m_nWidth, (float)m_nWindowHeight);
+				glVertex2f(0, (float)m_nWindowHeight);
+			glEnd();
+		}
 		m_pDoc->m_pUI->m_marker->draw(m_nWindowHeight - drawHeight);
 
 	}

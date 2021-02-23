@@ -45,9 +45,10 @@ void LineOverlay::draw(const Point target) {
 
 void LineOverlay::release(const Point target) {
 	if (!m_pDoc) return;
-	if (!m_validBrush) return;
-	
-	m_pDoc->setSize(m_size);
-	m_pDoc->m_pUI->m_BrushSizeSlider->value(m_size);
-	m_pDoc->setAngle(m_angle);
+	if (m_validBrush) {
+		m_pDoc->setSize(m_size);
+		m_pDoc->m_pUI->m_BrushSizeSlider->value(m_size);
+		m_pDoc->setAngle(m_angle);
+	}
+	m_validBrush = false;
 }
