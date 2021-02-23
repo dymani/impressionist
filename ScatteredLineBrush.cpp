@@ -40,6 +40,7 @@ void ScatteredLineBrush::BrushMove(const Point source, const Point target) {
 	double y = m_width / 2.0;
 
 	int sx, sy;
+	int tries = 0;
 	for (int i = 0; i < m_numLines; ++i) {
 		sx = rand() % m_size - (int)(m_size / 2);
 		sy = rand() % m_size - (int)(m_size / 2);
@@ -59,6 +60,8 @@ void ScatteredLineBrush::BrushMove(const Point source, const Point target) {
 			}
 			double px = sx * cosT + sy * sinT;
 			if (px < lim1 + m_size / 4 || px > lim2 - m_size / 4) {
+				if (++tries < 100)
+					--i;
 				continue;
 			}
 		}

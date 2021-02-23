@@ -23,8 +23,15 @@ class ImpressionistDoc;
 class OriginalView : public Fl_Gl_Window
 {
 public:
+	enum View {
+		ORIGINAL,
+		ANOTHER,
+		EDGE
+	};
 	OriginalView(int x, int y, int w, int h, const char *l);
 	
+	void setView(View v);
+
 	void draw();
 	void refresh();
 
@@ -35,6 +42,7 @@ public:
 private:
 	int	m_nWindowWidth, 
 		m_nWindowHeight;
+	View m_view;
 
 };
 

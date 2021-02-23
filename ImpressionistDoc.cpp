@@ -191,6 +191,14 @@ void ImpressionistDoc::setEdgeClipping(bool isEdgeClippingOn) {
 	m_isEdgeClippingOn = isEdgeClippingOn;
 }
 
+void ImpressionistDoc::applyEdgeDetection(int threshold) {
+	if (!m_ucBitmap)
+		return;
+	if (m_ucEdgeImage)
+		delete[] m_ucEdgeImage;
+	m_ucEdgeImage = m_convolutionManager->generateFilterImage(ConvolutionManager::FILTER_EDGE, m_ucBitmap, m_nWidth, m_nHeight, true, threshold);
+}
+
 
 //-------------------------------------------------
 // Get the red value
@@ -505,7 +513,7 @@ GLubyte* ImpressionistDoc::getEdgePixel(int x, int y) {
 	else if (y >= m_nHeight)
 		y = m_nHeight - 1;
 	if (!m_ucEdgeImage) {
-		m_ucEdgeImage = m_convolutionManager->generateFilterImage(ConvolutionManager::FILTER_EDGE, m_ucBitmap, m_nWidth, m_nHeight, false);
+		applyEdgeDetection(255);
 	}
 	return (GLubyte*)(m_ucEdgeImage + 3 * (y * m_nWidth + x));
 }

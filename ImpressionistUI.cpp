@@ -189,6 +189,7 @@ void ImpressionistUI::cb_load_image(Fl_Menu_* o, void* v)
 			// whoami(o)->m_edgeClipLightButton->deactivate();
 		}
 	}
+	whoami(o)->m_origView->refresh();
 }
 
 
@@ -240,6 +241,7 @@ void ImpressionistUI::cb_change_image(Fl_Menu_* o, void* v) {
 	if (newfile != NULL) {
 		pDoc->changeImage(newfile);
 	}
+	whoami(o)->m_origView->refresh();
 }
 
 void ImpressionistUI::cb_load_another_image(Fl_Menu_* o, void* v) {
@@ -256,6 +258,7 @@ void ImpressionistUI::cb_load_another_image(Fl_Menu_* o, void* v) {
 		}
 
 	}
+	whoami(o)->m_origView->refresh();
 	
 }
 
@@ -272,6 +275,7 @@ void ImpressionistUI::cb_load_edge_image(Fl_Menu_* o, void* v) {
 				whoami(o)->m_edgeClipLightButton->deactivate();*/
 		}
 	}
+	whoami(o)->m_origView->refresh();
 }
 
 //------------------------------------------------------------
@@ -303,6 +307,18 @@ void ImpressionistUI::cb_colors(Fl_Menu_* o, void* v)
 
 void ImpressionistUI::cb_filters(Fl_Menu_* o, void* v) {
 	whoami(o)->m_filterDialog->show();
+}
+
+void ImpressionistUI::cb_view_original(Fl_Menu_* o, void* v) {
+	whoami(o)->m_origView->setView(OriginalView::ORIGINAL);
+}
+
+void ImpressionistUI::cb_view_another(Fl_Menu_* o, void* v) {
+	whoami(o)->m_origView->setView(OriginalView::ANOTHER);
+}
+
+void ImpressionistUI::cb_view_edge(Fl_Menu_* o, void* v) {
+	whoami(o)->m_origView->setView(OriginalView::EDGE);
 }
 
 
@@ -419,6 +435,17 @@ void ImpressionistUI::cb_edge_clip_light_button(Fl_Widget* o, void* v) {
 	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
 	pUI->m_isEdgeClippingOn = !pUI->m_isEdgeClippingOn;
 	pUI->getDocument()->setEdgeClipping(pUI->m_isEdgeClippingOn);
+}
+
+void ImpressionistUI::cb_edge_threshold_slides(Fl_Widget* o, void* v) {
+	((ImpressionistUI*)(o->user_data()))->m_edgeThreshold = int(((Fl_Slider*)o)->value());
+}
+
+void ImpressionistUI::cb_edge_detection_button(Fl_Widget* o, void* v) {
+	ImpressionistDoc* pDoc = ((ImpressionistUI*)(o->user_data()))->getDocument();
+
+	pDoc->applyEdgeDetection(((ImpressionistUI*)(o->user_data()))->m_edgeThreshold);
+	((ImpressionistUI*)(o->user_data()))->m_origView->refresh();
 }
 
 //-----------------------------------------------------------
@@ -611,6 +638,11 @@ void ImpressionistUI::setAlpha(int alpha)
 	m_alpha = alpha;
 }
 
+
+int ImpressionistUI::getEdgeThreshold() {
+	return m_edgeThreshold;
+}
+
 //-------------------------------------------------
 // Get the red value
 //-------------------------------------------------
@@ -675,7 +707,11 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
 		{ 0 },
-
+	{ "&View",		0, 0, 0, FL_SUBMENU },
+		{ "&Original",	FL_CTRL + 'o', (Fl_Callback*)ImpressionistUI::cb_view_original, 0, FL_MENU_RADIO | FL_MENU_VALUE},
+		{ "&Another",	FL_CTRL + 'a', (Fl_Callback*)ImpressionistUI::cb_view_another, 0, FL_MENU_RADIO },
+		{ "&Edge",	FL_CTRL + 'e', (Fl_Callback*)ImpressionistUI::cb_view_edge, 0, FL_MENU_RADIO },
+		{ 0 },
 	{ "&Help",		0, 0, 0, FL_SUBMENU },
 		{ "&About",	FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_about },
 		{ 0 },
@@ -760,6 +796,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_isAnotherImageLoaded = false;
 	m_isEdgeClippingOn = false;
 	m_isEdgeImageLoaded = false;
+	m_edgeThreshold = 255;
 
 	m_redVal = 1.0;
 	m_greenVal = 1.0;
@@ -849,6 +886,22 @@ ImpressionistUI::ImpressionistUI() {
 		m_edgeClipLightButton->value(0);
 		m_edgeClipLightButton->callback(cb_edge_clip_light_button);
 		m_edgeClipLightButton->deactivate();
+
+		m_edgeThresholdSlider = new Fl_Value_Slider(10, 290, 200, 20, "Edge threshold");
+		m_edgeThresholdSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_edgeThresholdSlider->type(FL_HOR_NICE_SLIDER);
+		m_edgeThresholdSlider->labelfont(FL_COURIER);
+		m_edgeThresholdSlider->labelsize(12);
+		m_edgeThresholdSlider->minimum(1);
+		m_edgeThresholdSlider->maximum(400);
+		m_edgeThresholdSlider->step(1);
+		m_edgeThresholdSlider->value(m_edgeThreshold);
+		m_edgeThresholdSlider->align(FL_ALIGN_RIGHT);
+		m_edgeThresholdSlider->callback(cb_edge_threshold_slides);
+
+		m_edgeDetectionButton = new Fl_Button(320, 290, 75, 25, "&Detect");
+		m_edgeDetectionButton->user_data((void*)(this));
+		m_edgeDetectionButton->callback(cb_edge_detection_button);
 
     m_brushDialog->end();	
 
