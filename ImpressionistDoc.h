@@ -45,6 +45,7 @@ public:
 	void	setAlpha(int alpha);			// set the alpha value
 	void updateConvolutionPresetImage(bool isAnotherImage);
 	void setEdgeClipping(bool isEdgeClippingOn);
+	void applyEdgeDetection(int threshold);
 
 	double	getRedVal();				
 	void	setRedVal(double R);

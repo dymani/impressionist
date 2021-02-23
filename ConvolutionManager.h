@@ -43,7 +43,7 @@ public:
 
 	void initializePresets(unsigned char* image, int iWidth, int iHeight);
 
-	unsigned char* generateFilterImage(FilterChoice choice, unsigned char* source, int iWidth, int iHeight, bool isNormalized);
+	unsigned char* generateFilterImage(FilterChoice choice, unsigned char* source, int iWidth, int iHeight, bool isNormalized, int threshold = 255);
 	unsigned char* generateCustomFilterImage(int kernel[], int kWidth, int kHeight, unsigned char* image, int iWidth, int iHeight, bool isNormalized);
 
 	unsigned char* generatePresetImage(FilterPreset preset);

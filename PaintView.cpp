@@ -42,7 +42,6 @@ PaintView::PaintView(int			x,
 
 }
 
-
 void PaintView::draw()
 {
 	#ifndef MESA
@@ -181,58 +180,59 @@ void PaintView::draw()
 
 int PaintView::handle(int event)
 {
-	switch(event)
-	{
-	case FL_ENTER:
-		coord.x = Fl::event_x();
-		coord.y = Fl::event_y();
-		eventToDo = MOUSE_MOVE_;
-		isAnEvent = 1;
-	    redraw();
-		break;
-	case FL_PUSH:
-		coord.x = Fl::event_x();
-		coord.y = Fl::event_y();
-		if (Fl::event_button()>1)
-			eventToDo=RIGHT_MOUSE_DOWN;
-		else
-			eventToDo=LEFT_MOUSE_DOWN;
-		isAnEvent=1;
-		redraw();
-		break;
-	case FL_DRAG:
-		coord.x = Fl::event_x();
-		coord.y = Fl::event_y();
-		if (Fl::event_button()>1)
-			eventToDo=RIGHT_MOUSE_DRAG;
-		else
-			eventToDo=LEFT_MOUSE_DRAG;
-		isAnEvent=1;
-		redraw();
-		break;
-	case FL_RELEASE:
-		coord.x = Fl::event_x();
-		coord.y = Fl::event_y();
-		if (Fl::event_button()>1)
-			eventToDo=RIGHT_MOUSE_UP;
-		else
-			eventToDo=LEFT_MOUSE_UP;
-		isAnEvent=1;
-		redraw();
-		break;
-	case FL_MOVE:
-		coord.x = Fl::event_x();
-		coord.y = Fl::event_y();
-		eventToDo = MOUSE_MOVE_;
-		isAnEvent = 1;
-		redraw();
-		break;
-	default:
-		return 0;
-		break;
+	if (!isAnEvent) {
+		switch (event)
+		{
+		case FL_ENTER:
+			coord.x = Fl::event_x();
+			coord.y = Fl::event_y();
+			eventToDo = MOUSE_MOVE_;
+			isAnEvent = 1;
+			redraw();
+			break;
+		case FL_PUSH:
+			coord.x = Fl::event_x();
+			coord.y = Fl::event_y();
+			if (Fl::event_button() > 1)
+				eventToDo = RIGHT_MOUSE_DOWN;
+			else
+				eventToDo = LEFT_MOUSE_DOWN;
+			isAnEvent = 1;
+			redraw();
+			break;
+		case FL_DRAG:
+			coord.x = Fl::event_x();
+			coord.y = Fl::event_y();
+			if (Fl::event_button() > 1)
+				eventToDo = RIGHT_MOUSE_DRAG;
+			else
+				eventToDo = LEFT_MOUSE_DRAG;
+			isAnEvent = 1;
+			redraw();
+			break;
+		case FL_MOVE:
+			coord.x = Fl::event_x();
+			coord.y = Fl::event_y();
+			eventToDo = MOUSE_MOVE_;
+			isAnEvent = 1;
+			redraw();
+			break;
+		case FL_RELEASE:
+			coord.x = Fl::event_x();
+			coord.y = Fl::event_y();
+			if (Fl::event_button() > 1)
+				eventToDo = RIGHT_MOUSE_UP;
+			else
+				eventToDo = LEFT_MOUSE_UP;
+			isAnEvent = 1;
+			redraw();
+			break;
+		default:
+			return 0;
+			break;
 
+		}
 	}
-
 
 
 	return 1;

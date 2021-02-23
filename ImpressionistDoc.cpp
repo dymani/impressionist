@@ -176,10 +176,9 @@ void ImpressionistDoc::setAlpha(int alpha) {
 	m_pUI->setAlpha(alpha);
 }
 
-void ImpressionistDoc::updateConvolutionPresetImage(bool isAnotherImage) {
-	if (!m_ucAnotherImage)
-		return;
-	m_isUsingAnotherGradient = isAnotherImage;
+void ImpressionistDoc::updateConvolutionPresetImage(bool isUsingAnotherGradient) {
+	if (m_ucAnotherImage)
+		m_isUsingAnotherGradient = isUsingAnotherGradient;
 	if (m_isUsingAnotherGradient)
 		m_convolutionManager->initializePresets(m_ucAnotherImage, m_nWidth, m_nHeight);
 	else
@@ -190,6 +189,14 @@ void ImpressionistDoc::setEdgeClipping(bool isEdgeClippingOn) {
 	/*if (!m_ucEdgeImage)
 		return;*/
 	m_isEdgeClippingOn = isEdgeClippingOn;
+}
+
+void ImpressionistDoc::applyEdgeDetection(int threshold) {
+	if (!m_ucBitmap)
+		return;
+	if (m_ucEdgeImage)
+		delete[] m_ucEdgeImage;
+	m_ucEdgeImage = m_convolutionManager->generateFilterImage(ConvolutionManager::FILTER_EDGE, m_ucBitmap, m_nWidth, m_nHeight, true, threshold);
 }
 
 
@@ -506,7 +513,7 @@ GLubyte* ImpressionistDoc::getEdgePixel(int x, int y) {
 	else if (y >= m_nHeight)
 		y = m_nHeight - 1;
 	if (!m_ucEdgeImage) {
-		m_ucEdgeImage = m_convolutionManager->generateFilterImage(ConvolutionManager::FILTER_EDGE, m_ucBitmap, m_nWidth, m_nHeight, false);
+		applyEdgeDetection(255);
 	}
 	return (GLubyte*)(m_ucEdgeImage + 3 * (y * m_nWidth + x));
 }

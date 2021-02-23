@@ -54,6 +54,9 @@ public:
 	Fl_Light_Button* m_anotherGradientLightButton;
 	Fl_Light_Button* m_edgeClipLightButton;
 
+	Fl_Slider* m_edgeThresholdSlider;
+	Fl_Button* m_edgeDetectionButton;
+
 	Fl_Button*          m_ClearCanvasButton;
 
 // for color dialog
@@ -87,6 +90,7 @@ public:
 	void				setAngle(int angle);
 	int					getAlpha();
 	void				setAlpha(int alpha);
+	int getEdgeThreshold();
 	
 	double				getRedVal();
 	void				setRedVal(double R);
@@ -108,6 +112,8 @@ private:
 	bool m_isAnotherImageLoaded;
 	bool m_isEdgeClippingOn;
 	bool m_isEdgeImageLoaded;
+	int m_edgeThreshold;
+
 
 	double	m_redVal;
 	double	m_greenVal;
@@ -142,6 +148,9 @@ private:
 	static void	cb_exit(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
 	static void	cb_filters(Fl_Menu_* o, void* v);
+	static void	cb_view_original(Fl_Menu_* o, void* v);
+	static void	cb_view_another(Fl_Menu_* o, void* v);
+	static void	cb_view_edge(Fl_Menu_* o, void* v);
 
 	static void	cb_brushChoice(Fl_Widget* o, void* v);
 	static void	cb_clear_canvas_button(Fl_Widget* o, void* v);
@@ -152,6 +161,8 @@ private:
 	static void cb_alphaSlides(Fl_Widget* o, void* v);
 	static void cb_another_gradient_light_button(Fl_Widget* o, void* v);
 	static void cb_edge_clip_light_button(Fl_Widget* o, void* v);
+	static void cb_edge_threshold_slides(Fl_Widget* o, void* v);
+	static void	cb_edge_detection_button(Fl_Widget* o, void* v);
 
 	static void cb_color_chooser(Fl_Widget* o, void* v);
 

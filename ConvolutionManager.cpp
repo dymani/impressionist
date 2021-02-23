@@ -72,7 +72,7 @@ void ConvolutionManager::initializePresets(unsigned char* image, int iWidth, int
 	}
 }
 
-unsigned char* ConvolutionManager::generateFilterImage(FilterChoice choice, unsigned char* source, int iWidth, int iHeight, bool isNormalized) {
+unsigned char* ConvolutionManager::generateFilterImage(FilterChoice choice, unsigned char* source, int iWidth, int iHeight, bool isNormalized, int threshold) {
 	if (choice == FILTER_CUSTOM || choice == NUM_FILTER_CHOICE)
 		return nullptr;
 	if (choice == FILTER_EDGE) {
@@ -93,7 +93,7 @@ unsigned char* ConvolutionManager::generateFilterImage(FilterChoice choice, unsi
 				double ty = m_presets[GRADIENT_SOBEL_Y]->getPixelResult(x, y, 0);
 				double value = sqrt(tx * tx + ty * ty);
 				if (isNormalized) {
-					if (value >= 128)
+					if (value >= threshold)
 						value = 255;
 					else
 						value = 0;
