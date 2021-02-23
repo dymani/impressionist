@@ -76,6 +76,9 @@ public:
 	unsigned char* getAnotherImage();
 	unsigned char* getEdgeImage();
 
+	void setPainting(unsigned char* p);
+	unsigned char* m_ucPaintingUndo;
+
 	// The current active brush.
 	ImpBrush*			m_pCurrentBrush;	
 	// Size of the brush.

@@ -372,7 +372,18 @@ void ImpressionistUI::cb_clear_canvas_button(Fl_Widget* o, void* v)
 	pDoc->clearCanvas();
 }
 
-
+//------------------------------------------------------------
+// Undo
+//------------------------------------------------------------
+void ImpressionistUI::cb_undo(Fl_Menu_* o, void* v)
+{
+	ImpressionistDoc* pDoc = whoami(o)->getDocument();
+	unsigned char* temp = pDoc->getPainting();
+	pDoc->setPainting(pDoc->m_ucPaintingUndo);
+	pDoc->m_ucPaintingUndo = temp;
+	pDoc->m_pUI->m_paintView->refresh();
+	glFlush();
+}
 
 void ImpressionistUI::cb_strokeDirectionChoice(Fl_Widget* o, void* v)
 {
@@ -698,6 +709,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "&Save Image...",	FL_ALT + 's', (Fl_Callback *)ImpressionistUI::cb_save_image },
 		{ "&Brushes...",	FL_ALT + 'b', (Fl_Callback *)ImpressionistUI::cb_brushes },
 		{ "&Clear Canvas", FL_ALT + 'c', (Fl_Callback*)ImpressionistUI::cb_clear_canvas , 0, FL_MENU_DIVIDER },
+		{ "&Undo", FL_ALT + 'z', (Fl_Callback*)ImpressionistUI::cb_undo },
 		{ "&Colors...", FL_ALT + 'k', (Fl_Callback *)ImpressionistUI::cb_colors, 0, FL_MENU_DIVIDER },
 		{ "S&wap contents", FL_ALT + 'w', (Fl_Callback *)ImpressionistUI::cb_swap_contents,},
 		{ "Change &mural image", FL_ALT + 'm', (Fl_Callback*)ImpressionistUI::cb_change_image},
