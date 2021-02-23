@@ -176,10 +176,9 @@ void ImpressionistDoc::setAlpha(int alpha) {
 	m_pUI->setAlpha(alpha);
 }
 
-void ImpressionistDoc::updateConvolutionPresetImage(bool isAnotherImage) {
-	if (!m_ucAnotherImage)
-		return;
-	m_isUsingAnotherGradient = isAnotherImage;
+void ImpressionistDoc::updateConvolutionPresetImage(bool isUsingAnotherGradient) {
+	if (m_ucAnotherImage)
+		m_isUsingAnotherGradient = isUsingAnotherGradient;
 	if (m_isUsingAnotherGradient)
 		m_convolutionManager->initializePresets(m_ucAnotherImage, m_nWidth, m_nHeight);
 	else

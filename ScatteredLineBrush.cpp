@@ -59,7 +59,6 @@ void ScatteredLineBrush::BrushMove(const Point source, const Point target) {
 			}
 			double px = sx * cosT + sy * sinT;
 			if (px < lim1 + m_size / 4 || px > lim2 - m_size / 4) {
-				--i;
 				continue;
 			}
 		}

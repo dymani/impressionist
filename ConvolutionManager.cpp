@@ -93,7 +93,7 @@ unsigned char* ConvolutionManager::generateFilterImage(FilterChoice choice, unsi
 				double ty = m_presets[GRADIENT_SOBEL_Y]->getPixelResult(x, y, 0);
 				double value = sqrt(tx * tx + ty * ty);
 				if (isNormalized) {
-					if (value >= 128)
+					if (value >= 64)
 						value = 255;
 					else
 						value = 0;

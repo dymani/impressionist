@@ -186,8 +186,6 @@ void ImpressionistUI::cb_load_image(Fl_Menu_* o, void* v)
 			whoami(o)->m_anotherGradientLightButton->value(0);
 			whoami(o)->m_anotherGradientLightButton->deactivate();
 			whoami(o)->m_isEdgeImageLoaded = false;
-			whoami(o)->m_isEdgeClippingOn= false;
-			whoami(o)->m_edgeClipLightButton->value(0);
 			// whoami(o)->m_edgeClipLightButton->deactivate();
 		}
 	}
