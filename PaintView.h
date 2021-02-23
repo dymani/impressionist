@@ -22,6 +22,8 @@ public:
 	void draw();
 	int handle(int event);
 
+	void saveUndo();
+
 	void refresh();
 	
 	void resizeWindow(int width, int height);
