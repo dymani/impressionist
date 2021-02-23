@@ -145,7 +145,6 @@ private:
 
 	static void	cb_brushChoice(Fl_Widget* o, void* v);
 	static void	cb_clear_canvas_button(Fl_Widget* o, void* v);
-	static void cb_undo(Fl_Menu_* o, void* v);
 	static void	cb_strokeDirectionChoice(Fl_Widget* o, void* v);
 	static void	cb_sizeSlides(Fl_Widget* o, void* v);
 	static void cb_widthSlides(Fl_Widget* o, void* v);

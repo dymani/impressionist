@@ -40,7 +40,6 @@ ImpressionistDoc::ImpressionistDoc()
 	m_nWidth		= -1;
 	m_ucBitmap		= NULL;
 	m_ucPainting	= NULL;
-	m_ucPaintingUndo = nullptr;
 	m_ucAnotherImage = nullptr;
 	m_isUsingAnotherGradient = false;
 	m_ucEdgeImage = nullptr;
@@ -111,10 +110,6 @@ unsigned char* ImpressionistDoc::getAnotherImage() {
 
 unsigned char* ImpressionistDoc::getEdgeImage() {
 	return m_ucEdgeImage;
-}
-
-void ImpressionistDoc::setPainting(unsigned char* p) {
-	m_ucPainting = p;
 }
 
 //---------------------------------------------------------
@@ -273,7 +268,6 @@ int ImpressionistDoc::loadImage(char *iname)
 	// release old storage
 	if ( m_ucBitmap ) delete [] m_ucBitmap;
 	if ( m_ucPainting ) delete [] m_ucPainting;
-	if (m_ucPaintingUndo) delete[] m_ucPaintingUndo;
 	if (m_ucAnotherImage) delete[] m_ucAnotherImage;
 
 	m_ucBitmap		= data;
@@ -281,10 +275,6 @@ int ImpressionistDoc::loadImage(char *iname)
 	// allocate space for draw view
 	m_ucPainting	= new unsigned char [width*height*3];
 	memset(m_ucPainting, 0, width*height*3);
-
-	// allocate space for undo memories
-	m_ucPaintingUndo = new unsigned char[width * height * 3];
-	memset(m_ucPaintingUndo, 0, width * height * 3);
 
 	m_ucAnotherImage = nullptr;
 	m_isUsingAnotherGradient = false;
