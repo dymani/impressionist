@@ -262,17 +262,6 @@ void ImpressionistUI::cb_load_another_image(Fl_Menu_* o, void* v) {
 	
 }
 
-void ImpressionistUI::cb_load_dissolve_image(Fl_Menu_* o, void* v) {
-	ImpressionistDoc* pDoc = whoami(o)->getDocument();
-	if (pDoc->getBitmap()) {
-		char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
-		if (newfile != NULL) {
-			pDoc->loadDissolveImage(newfile);
-		}
-		whoami(o)->m_origView->refresh();
-	}
-}
-
 void ImpressionistUI::cb_load_edge_image(Fl_Menu_* o, void* v) {
 	ImpressionistDoc* pDoc = whoami(o)->getDocument();
 
@@ -287,6 +276,7 @@ void ImpressionistUI::cb_load_edge_image(Fl_Menu_* o, void* v) {
 		}
 	}
 	whoami(o)->m_origView->refresh();
+	whoami(o)->m_paintView->refresh();
 }
 
 //------------------------------------------------------------
@@ -388,11 +378,13 @@ void ImpressionistUI::cb_clear_canvas_button(Fl_Widget* o, void* v)
 //------------------------------------------------------------
 void ImpressionistUI::cb_undo(Fl_Menu_* o, void* v)
 {
-	ImpressionistDoc* pDoc = whoami(o)->getDocument();
-	unsigned char* temp = pDoc->getPainting();
-	pDoc->setPainting(pDoc->m_ucPaintingUndo);
-	pDoc->m_ucPaintingUndo = temp;
-	pDoc->m_pUI->m_paintView->refresh();
+	// swap the saved bitmap in m_ucPaintingUndo
+	unsigned char* temp = whoami(o)->getDocument()->getPainting();
+	whoami(o)->getDocument()->setPainting(whoami(o)->getDocument()->m_ucPaintingUndo);
+	whoami(o)->getDocument()->m_ucPaintingUndo = temp;
+
+	// refresh
+	whoami(o)->getDocument()->m_pUI->m_paintView->refresh();
 	glFlush();
 }
 
@@ -478,6 +470,20 @@ void ImpressionistUI::cb_color_chooser(Fl_Widget* o, void* v)
 	((ImpressionistUI*)(o->user_data()))->m_redVal = ((Fl_Color_Chooser*)o)->r();
 	((ImpressionistUI*)(o->user_data()))->m_greenVal = ((Fl_Color_Chooser*)o)->g();
 	((ImpressionistUI*)(o->user_data()))->m_blueVal = ((Fl_Color_Chooser*)o)->b();
+}
+
+//-----------------------------------------------------------
+// Load dissolve image
+//-----------------------------------------------------------
+void ImpressionistUI::cb_load_dissolve_image(Fl_Menu_* o, void* v) {
+	ImpressionistDoc* pDoc = whoami(o)->getDocument();
+	if (pDoc->getBitmap()) {
+		char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+		if (newfile != NULL) {
+			pDoc->loadDissolveImage(newfile);
+		}
+		whoami(o)->m_paintView->refresh();
+	}
 }
 
 //---------------------------------- filter dialog functions --------------------------------------
@@ -725,8 +731,8 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "S&wap contents", FL_ALT + 'w', (Fl_Callback *)ImpressionistUI::cb_swap_contents,},
 		{ "Change &mural image", FL_ALT + 'm', (Fl_Callback*)ImpressionistUI::cb_change_image},
 		{ "Load a&nother image...", FL_ALT + 'n', (Fl_Callback*)ImpressionistUI::cb_load_another_image},
-		{ "Load &dissolve image...", FL_ALT + 'd', (Fl_Callback*)ImpressionistUI::cb_load_dissolve_image },
 		{ "Load &edge image...", FL_ALT + 'e', (Fl_Callback*)ImpressionistUI::cb_load_edge_image, 0, FL_MENU_DIVIDER },
+		{ "Load &dissolve image...", FL_ALT + 'd', (Fl_Callback*)ImpressionistUI::cb_load_dissolve_image },
 		{ "&Filters...", FL_ALT + 'f', (Fl_Callback*)ImpressionistUI::cb_filters, 0, FL_MENU_DIVIDER },
 
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },

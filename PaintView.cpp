@@ -241,8 +241,13 @@ int PaintView::handle(int event)
 
 void PaintView::saveUndo()
 {
-	int size = m_pDoc->m_nPaintHeight * m_pDoc->m_nPaintWidth * 3;
-	delete[] m_pDoc->m_ucPaintingUndo;
+	// get the bitmap char* size before releasing previous data
+	int size = m_pDoc->m_nPaintHeight * m_pDoc->m_nPaintWidth * 3;	
+
+	// release previous data
+	delete[] m_pDoc->m_ucPaintingUndo;							
+
+	// save the bitmap
 	m_pDoc->m_ucPaintingUndo = new unsigned char[size];
 	memcpy(m_pDoc->m_ucPaintingUndo, m_pDoc->getPainting(), size);
 }

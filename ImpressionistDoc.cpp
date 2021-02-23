@@ -441,17 +441,23 @@ int ImpressionistDoc::loadDissolveImage(char* name) {
 	if (m_ucDissolveImage) delete[] m_ucDissolveImage;
 	m_ucDissolveImage = data;
 
+	// save the original canvas
+	m_pUI->m_paintView->saveUndo();
+
+	// get the dissolve rate by the alpha value;
+	double dissolveRate = m_pUI->getAlpha() / 255.0;
+
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			int index = (i * width + j) * 3;
-			m_ucBitmap[index] = 0.5 * m_ucBitmap[index] + 0.5 * m_ucDissolveImage[index];
-			m_ucBitmap[index + 1] = 0.5 * m_ucBitmap[index + 1] + 0.5 * m_ucDissolveImage[index + 1];
-			m_ucBitmap[index + 2] = 0.5 * m_ucBitmap[index + 2] + 0.5 * m_ucDissolveImage[index + 2];
+			for (int k = 0; k < 3; k++) {
+				int index = (i * width + j) * 3 + k;
+				m_ucPainting[index] = (1 - dissolveRate) * m_ucPainting[index] + dissolveRate * m_ucDissolveImage[index];
+			}
 		}
 	}
 
 	//refresh display
-	m_pUI->m_origView->refresh();
+	m_pUI->m_paintView->refresh();
 
 	return 1;
 }
