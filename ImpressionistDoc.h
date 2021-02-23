@@ -28,6 +28,7 @@ public:
 	int swapContents();
 	int changeImage(char* name);
 	int loadAnotherImage(char* name);
+	int loadDissolveImage(char* name);
 	int loadEdgeImage(char* name);
 
 	int applyFilter(int filterType, int filterSource, bool isNormalized);
@@ -69,11 +70,13 @@ private:
 	unsigned char*	m_ucBitmap;
 	unsigned char*	m_ucPainting;
 	unsigned char* m_ucAnotherImage;
+	unsigned char* m_ucDissolveImage;
 	unsigned char* m_ucEdgeImage;
 public:
 	unsigned char* getBitmap();
 	unsigned char* getPainting();
 	unsigned char* getAnotherImage();
+	unsigned char* getDissolveImage();
 	unsigned char* getEdgeImage();
 
 	void setPainting(unsigned char* p);

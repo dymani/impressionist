@@ -42,6 +42,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_ucPainting	= NULL;
 	m_ucPaintingUndo = nullptr;
 	m_ucAnotherImage = nullptr;
+	m_ucDissolveImage = nullptr;
 	m_isUsingAnotherGradient = false;
 	m_ucEdgeImage = nullptr;
 	m_isEdgeClippingOn = false;
@@ -107,6 +108,10 @@ unsigned char* ImpressionistDoc::getPainting() {
 
 unsigned char* ImpressionistDoc::getAnotherImage() { 
 	return m_ucAnotherImage;
+}
+
+unsigned char* ImpressionistDoc::getDissolveImage() {
+	return m_ucDissolveImage;
 }
 
 unsigned char* ImpressionistDoc::getEdgeImage() {
@@ -412,6 +417,41 @@ int ImpressionistDoc::loadAnotherImage(char* name) {
 	m_ucAnotherImage = data;
 
 	updateConvolutionPresetImage(m_isUsingAnotherGradient);
+
+	return 1;
+}
+
+int ImpressionistDoc::loadDissolveImage(char* name) {
+	// try to open the image to read
+	unsigned char* data;
+	int width, height;
+
+	if ((data = readBMP(name, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+
+	if (m_nWidth != width || m_nHeight != height) {
+		fl_alert("Edge image should have the same dimension");
+		return 0;
+	}
+
+	// release old storage
+	if (m_ucDissolveImage) delete[] m_ucDissolveImage;
+	m_ucDissolveImage = data;
+
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			int index = (i * width + j) * 3;
+			m_ucBitmap[index] = 0.5 * m_ucBitmap[index] + 0.5 * m_ucDissolveImage[index];
+			m_ucBitmap[index + 1] = 0.5 * m_ucBitmap[index + 1] + 0.5 * m_ucDissolveImage[index + 1];
+			m_ucBitmap[index + 2] = 0.5 * m_ucBitmap[index + 2] + 0.5 * m_ucDissolveImage[index + 2];
+		}
+	}
+
+	//refresh display
+	m_pUI->m_origView->refresh();
 
 	return 1;
 }
