@@ -262,6 +262,17 @@ void ImpressionistUI::cb_load_another_image(Fl_Menu_* o, void* v) {
 	
 }
 
+void ImpressionistUI::cb_load_dissolve_image(Fl_Menu_* o, void* v) {
+	ImpressionistDoc* pDoc = whoami(o)->getDocument();
+	if (pDoc->getBitmap()) {
+		char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+		if (newfile != NULL) {
+			pDoc->loadDissolveImage(newfile);
+		}
+		whoami(o)->m_origView->refresh();
+	}
+}
+
 void ImpressionistUI::cb_load_edge_image(Fl_Menu_* o, void* v) {
 	ImpressionistDoc* pDoc = whoami(o)->getDocument();
 
@@ -714,6 +725,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "S&wap contents", FL_ALT + 'w', (Fl_Callback *)ImpressionistUI::cb_swap_contents,},
 		{ "Change &mural image", FL_ALT + 'm', (Fl_Callback*)ImpressionistUI::cb_change_image},
 		{ "Load a&nother image...", FL_ALT + 'n', (Fl_Callback*)ImpressionistUI::cb_load_another_image},
+		{ "Load &dissolve image...", FL_ALT + 'd', (Fl_Callback*)ImpressionistUI::cb_load_dissolve_image },
 		{ "Load &edge image...", FL_ALT + 'e', (Fl_Callback*)ImpressionistUI::cb_load_edge_image, 0, FL_MENU_DIVIDER },
 		{ "&Filters...", FL_ALT + 'f', (Fl_Callback*)ImpressionistUI::cb_filters, 0, FL_MENU_DIVIDER },
 
