@@ -1,4 +1,5 @@
 #include "ConvolutionManager.h"
+#include <cmath>
 
 ConvolutionManager::ConvolutionManager() {
 	m_image = nullptr;
@@ -32,6 +33,8 @@ ConvolutionManager::ConvolutionManager() {
 	m_filters[FILTER_SOBEL_Y] = new Convolution(Kernel::SOBEL_Y, 3, 3);
 	m_filters[FILTER_SOBEL_Y]->setValueFunction(Convolution::RGB);
 	m_filters[FILTER_SOBEL_Y]->setRgbOutput(true);
+
+	m_filters[FILTER_EDGE] = nullptr;
 
 	m_filters[FILTER_CUSTOM] = nullptr;
 
@@ -72,6 +75,47 @@ void ConvolutionManager::initializePresets(unsigned char* image, int iWidth, int
 unsigned char* ConvolutionManager::generateFilterImage(FilterChoice choice, unsigned char* source, int iWidth, int iHeight, bool isNormalized) {
 	if (choice == FILTER_CUSTOM || choice == NUM_FILTER_CHOICE)
 		return nullptr;
+	if (choice == FILTER_EDGE) {
+		m_presets[GRADIENT_GAUSSIAN_5]->setImage(source, iWidth, iHeight, true);
+		double* gaussian = m_presets[GRADIENT_GAUSSIAN_5]->getResult();
+
+		m_presets[GRADIENT_SOBEL_X]->setImage(gaussian, iWidth, iHeight, false);
+		m_presets[GRADIENT_SOBEL_X]->compute();
+
+		m_presets[GRADIENT_SOBEL_Y]->setImage(gaussian, iWidth, iHeight, false);
+		m_presets[GRADIENT_SOBEL_Y]->compute();
+
+		unsigned char* result = new unsigned char[iWidth * iHeight * 3];
+
+		for (int y = 0; y < iHeight; ++y) {
+			for (int x = 0; x < iWidth; ++x) {
+				double tx = m_presets[GRADIENT_SOBEL_X]->getPixelResult(x, y, 0);
+				double ty = m_presets[GRADIENT_SOBEL_Y]->getPixelResult(x, y, 0);
+				double value = sqrt(tx * tx + ty * ty);
+				if (isNormalized) {
+					if (value >= 128)
+						value = 255;
+					else
+						value = 0;
+				}
+				else {
+					if (value > 255)
+						value = 255;
+				}
+				result[(y * iWidth + x) * 3 + 0] = (unsigned char)value;
+				result[(y * iWidth + x) * 3 + 1] = (unsigned char)value;
+				result[(y * iWidth + x) * 3 + 2] = (unsigned char)value;
+			}
+		}
+
+		m_presets[GRADIENT_GAUSSIAN_5]->setImage(m_image, m_iWidth, m_iHeight, true);
+		gaussian = m_presets[GRADIENT_GAUSSIAN_5]->getResult();
+		m_presets[GRADIENT_SOBEL_X]->setImage(gaussian, m_iWidth, m_iHeight, false);
+		m_presets[GRADIENT_SOBEL_X]->compute();
+		m_presets[GRADIENT_SOBEL_Y]->setImage(gaussian, m_iWidth, m_iHeight, false);
+		m_presets[GRADIENT_SOBEL_Y]->compute();
+		return result;
+	}
 	m_filters[choice]->setImage(source, iWidth, iHeight, true);
 	m_filters[choice]->setNormalized(isNormalized);
 	return m_filters[choice]->generateImage();
