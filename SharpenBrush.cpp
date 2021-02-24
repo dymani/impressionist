@@ -8,7 +8,7 @@ SharpenBrush::SharpenBrush(ImpressionistDoc* pDoc, char* name)
 	m_size = 0;
 }
 
-void SharpenBrush::BrushBegin(const Point source, const Point target) {
+void SharpenBrush::BrushBegin(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg = pDoc->m_pUI;
 
@@ -19,7 +19,7 @@ void SharpenBrush::BrushBegin(const Point source, const Point target) {
 	BrushMove(source, target);
 }
 
-void SharpenBrush::BrushMove(const Point source, const Point target) {
+void SharpenBrush::BrushMove(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 
 	if (pDoc == NULL) {
@@ -44,6 +44,6 @@ void SharpenBrush::BrushMove(const Point source, const Point target) {
 	glEnd();
 }
 
-void SharpenBrush::BrushEnd(const Point source, const Point target) {
+void SharpenBrush::BrushEnd(const IPoint source, const IPoint target) {
 	m_size = 0;
 }

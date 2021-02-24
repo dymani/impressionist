@@ -4,7 +4,7 @@
 Marker::Marker() : m_source(100, 100) {
 }
 
-void Marker::update(const Point source) {
+void Marker::update(const IPoint source) {
 	m_source = source;
 }
 

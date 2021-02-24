@@ -40,7 +40,7 @@ char* ImpBrush::BrushName(void)
 // which is the coord at the original window to sample 
 // the color from
 //----------------------------------------------------
-void ImpBrush::SetColor (const Point source, int alpha)
+void ImpBrush::SetColor (const IPoint source, int alpha)
 {
 	ImpressionistDoc* pDoc = GetDocument();
 

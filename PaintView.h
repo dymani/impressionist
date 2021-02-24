@@ -34,6 +34,18 @@ public:
 
 	ImpressionistDoc *m_pDoc;
 
+	int getWindowHeight() {
+		return m_nWindowHeight;
+	}
+
+	int getDrawHeight() {
+		return m_nDrawHeight;
+	}
+
+	int getDrawWidth() {
+		return m_nDrawWidth;
+	}
+
 private:
 	GLvoid* m_pPaintBitstart;
 	int		m_nDrawWidth,

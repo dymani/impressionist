@@ -8,7 +8,7 @@ BlurBrush::BlurBrush(ImpressionistDoc* pDoc, char* name)
 	m_size = 0;
 }
 
-void BlurBrush::BrushBegin(const Point source, const Point target) {
+void BlurBrush::BrushBegin(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg = pDoc->m_pUI;
 
@@ -19,7 +19,7 @@ void BlurBrush::BrushBegin(const Point source, const Point target) {
 	BrushMove(source, target);
 }
 
-void BlurBrush::BrushMove(const Point source, const Point target) {
+void BlurBrush::BrushMove(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 
 	if (pDoc == NULL) {
@@ -44,6 +44,6 @@ void BlurBrush::BrushMove(const Point source, const Point target) {
 	glEnd();
 }
 
-void BlurBrush::BrushEnd(const Point source, const Point target) {
+void BlurBrush::BrushEnd(const IPoint source, const IPoint target) {
 	m_size = 0;
 }

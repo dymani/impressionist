@@ -15,7 +15,7 @@ CircleBrush::CircleBrush(ImpressionistDoc* pDoc, char* name) :
 {
 }
 
-void CircleBrush::BrushBegin(const Point source, const Point target)
+void CircleBrush::BrushBegin(const IPoint source, const IPoint target)
 {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg = pDoc->m_pUI;
@@ -23,7 +23,7 @@ void CircleBrush::BrushBegin(const Point source, const Point target)
 	BrushMove(source, target);
 }
 
-void CircleBrush::BrushMove(const Point source, const Point target)
+void CircleBrush::BrushMove(const IPoint source, const IPoint target)
 {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg = pDoc->m_pUI;
@@ -45,7 +45,7 @@ void CircleBrush::BrushMove(const Point source, const Point target)
 
 }
 
-void CircleBrush::MakeCircle(ImpressionistDoc* doc, const Point source, const Point target, double r, bool even) {
+void CircleBrush::MakeCircle(ImpressionistDoc* doc, const IPoint source, const IPoint target, double r, bool even) {
 	// Get the theta of each segment
 	float dtheta = 2.0f * M_PI / 360.0f;
 
@@ -68,7 +68,7 @@ void CircleBrush::MakeCircle(ImpressionistDoc* doc, const Point source, const Po
 	glEnd();
 }
 
-void CircleBrush::BrushEnd(const Point source, const Point target)
+void CircleBrush::BrushEnd(const IPoint source, const IPoint target)
 {
 	// do nothing so far
 }

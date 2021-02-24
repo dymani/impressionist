@@ -9,9 +9,7 @@
 #include "impressionistUI.h"
 #include "originalview.h"
 
-#ifndef WIN32
 #define min(a, b)	( ( (a)<(b) ) ? (a) : (b) )
-#endif
 
 OriginalView::OriginalView(int			x, 
 						   int			y, 
@@ -62,7 +60,7 @@ void OriginalView::draw()
 		GLvoid* bitstart = nullptr;
 
 		// we are not using a scrollable window, so ignore it
-		Point scrollpos;	// = GetScrollPosition();
+		IPoint scrollpos;	// = GetScrollPosition();
 		scrollpos.x=scrollpos.y=0;
 
 		drawWidth	= min( m_nWindowWidth, m_pDoc->m_nWidth );

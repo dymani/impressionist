@@ -7,7 +7,7 @@ ScatteredPointBrush::ScatteredPointBrush(ImpressionistDoc* pDoc, char* name)
 	: PointBrush(pDoc, name), m_regionSize(1), m_density(1.0f) {
 }
 
-void ScatteredPointBrush::BrushBegin(const Point source, const Point target)
+void ScatteredPointBrush::BrushBegin(const IPoint source, const IPoint target)
 {
 	ImpressionistDoc* pDoc = GetDocument();
 
@@ -18,7 +18,7 @@ void ScatteredPointBrush::BrushBegin(const Point source, const Point target)
 	BrushMove(source, target);
 }
 
-void ScatteredPointBrush::BrushMove(const Point source, const Point target) {
+void ScatteredPointBrush::BrushMove(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 	
 	if (pDoc == NULL) {
@@ -30,6 +30,6 @@ void ScatteredPointBrush::BrushMove(const Point source, const Point target) {
 	for (int i = 0; i < (int)(m_regionSize * m_regionSize * m_density); ++i) {
 		dx = rand() % m_regionSize - (int)(m_regionSize / 2);
 		dy = rand() % m_regionSize - (int)(m_regionSize / 2);
-		drawPoint(Point(source.x + dx, source.y + dy), Point(target.x + dx, target.y + dy));
+		drawPoint(IPoint(source.x + dx, source.y + dy), IPoint(target.x + dx, target.y + dy));
 	}
 }

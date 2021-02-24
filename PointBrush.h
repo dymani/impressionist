@@ -14,12 +14,12 @@ class PointBrush : public ImpBrush
 public:
 	PointBrush( ImpressionistDoc* pDoc = NULL, char* name = NULL );
 
-	void BrushBegin( const Point source, const Point target );
-	void BrushMove( const Point source, const Point target );
-	void BrushEnd( const Point source, const Point target );
+	void BrushBegin( const IPoint source, const IPoint target );
+	void BrushMove( const IPoint source, const IPoint target );
+	void BrushEnd( const IPoint source, const IPoint target );
 	char* BrushName( void );
 protected:
-	void drawPoint(const Point source, const Point target);
+	void drawPoint(const IPoint source, const IPoint target);
 	int m_size;
 };
 

@@ -6,7 +6,7 @@
 class ScatteredLineBrush : public LineBrush {
 public:
 	ScatteredLineBrush(ImpressionistDoc* pDoc = NULL, char* name = NULL);
-	void BrushMove(const Point source, const Point target);
+	void BrushMove(const IPoint source, const IPoint target);
 private:
 	int m_numLines;
 };
