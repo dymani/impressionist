@@ -23,6 +23,7 @@
 #include "SharpenBrush.h"
 #include "BlurBrush.h"
 #include "WarpBrush.h"
+#include "SmudgeBrush.h"
 
 #include "LineOverlay.h"
 #include "InputTable.h"
@@ -76,6 +77,8 @@ ImpressionistDoc::ImpressionistDoc()
 		= new BlurBrush(this, "Blur");
 	ImpBrush::c_pBrushes[BRUSH_WARP]
 		= new WarpBrush(this, "Warp");
+	ImpBrush::c_pBrushes[BRUSH_SMUDGE]
+		= new SmudgeBrush(this, "Smudge");
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];	
@@ -199,8 +202,6 @@ void ImpressionistDoc::updateConvolutionPresetImage(bool isUsingAnotherGradient)
 }
 
 void ImpressionistDoc::setEdgeClipping(bool isEdgeClippingOn) {
-	/*if (!m_ucEdgeImage)
-		return;*/
 	m_isEdgeClippingOn = isEdgeClippingOn;
 }
 
@@ -210,6 +211,14 @@ void ImpressionistDoc::applyEdgeDetection(int threshold) {
 	if (m_ucEdgeImage)
 		delete[] m_ucEdgeImage;
 	m_ucEdgeImage = m_convolutionManager->generateFilterImage(ConvolutionManager::FILTER_EDGE, m_ucBitmap, m_nWidth, m_nHeight, true, threshold);
+}
+
+int ImpressionistDoc::getStrength() {
+	return m_pUI->getStrength();
+}
+
+void ImpressionistDoc::setStrength(int strength) {
+	return m_pUI->setStrength(strength);
 }
 
 

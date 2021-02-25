@@ -4,7 +4,6 @@
 #include "ImpBrush.h"
 #include <FL/Fl.H>
 #include <imgwarp/imgwarp_mls.h>
-#include <vector>
 
 class WarpBrush : public ImpBrush {
 public:
@@ -13,17 +12,13 @@ public:
 	void BrushMove(const IPoint source, const IPoint target);
 	void BrushEnd(const IPoint source, const IPoint target);
 protected:
-	void initKernel();
 	int m_size;
-	IPoint m_prev;
-	double* m_kernel;
+	int m_strength;
 
-	int m_startX, m_startY;
+	cv::Point m_start;
 
 	ImgWarp_MLS* m_imageWarp;
 	cv::Mat* m_paintingMat;
-
-	std::vector<cv::Point> m_anchors;
 };
 
 #endif

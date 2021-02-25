@@ -186,7 +186,6 @@ void ImpressionistUI::cb_load_image(Fl_Menu_* o, void* v)
 			whoami(o)->m_anotherGradientLightButton->value(0);
 			whoami(o)->m_anotherGradientLightButton->deactivate();
 			whoami(o)->m_isEdgeImageLoaded = false;
-			// whoami(o)->m_edgeClipLightButton->deactivate();
 		}
 	}
 	whoami(o)->m_origView->refresh();
@@ -269,10 +268,6 @@ void ImpressionistUI::cb_load_edge_image(Fl_Menu_* o, void* v) {
 	if (newfile != NULL) {
 		if (pDoc->loadEdgeImage(newfile) == 1) {
 			whoami(o)->m_isEdgeImageLoaded = true;
-			/*if (whoami(o)->m_brushType == BRUSH_LINES || whoami(o)->m_brushType == BRUSH_SCATTERED_LINES)
-				whoami(o)->m_edgeClipLightButton->activate();
-			else
-				whoami(o)->m_edgeClipLightButton->deactivate();*/
 		}
 	}
 	whoami(o)->m_origView->refresh();
@@ -287,6 +282,7 @@ void ImpressionistUI::cb_exit(Fl_Menu_* o, void* v)
 {
 	whoami(o)->m_mainWindow->hide();
 	whoami(o)->m_brushDialog->hide();
+	whoami(o)->m_filterDialog->hide();
 
 }
 
@@ -348,17 +344,16 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 			pUI->m_anotherGradientLightButton->activate();
 		else
 			pUI->m_anotherGradientLightButton->deactivate();
-		//if (pUI->m_isEdgeImageLoaded)
-			pUI->m_edgeClipLightButton->activate();
-		//else
-			//pUI->m_edgeClipLightButton->deactivate();
+		pUI->m_edgeClipLightButton->activate();
+		pUI->m_strengthSlider->deactivate();
 	}
-	else if (pUI->m_brushType == BRUSH_WARP) {
+	else if (pUI->m_brushType == BRUSH_WARP || pUI->m_brushType == BRUSH_SMUDGE) {
 		pUI->m_strokeDirectionChoice->deactivate();
-		pUI->m_LineWidthSlider->activate();
+		pUI->m_LineWidthSlider->deactivate();
 		pUI->m_LineAngleSlider->deactivate();
 		pUI->m_anotherGradientLightButton->deactivate();
 		pUI->m_edgeClipLightButton->deactivate();
+		pUI->m_strengthSlider->activate();
 	}
 	else {
 		pUI->m_strokeDirectionChoice->deactivate();
@@ -366,6 +361,7 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 		pUI->m_LineAngleSlider->deactivate();
 		pUI->m_anotherGradientLightButton->deactivate();
 		pUI->m_edgeClipLightButton->deactivate();
+		pUI->m_strengthSlider->deactivate();
 	}
 }
 
@@ -467,6 +463,11 @@ void ImpressionistUI::cb_edge_detection_button(Fl_Widget* o, void* v) {
 
 	pDoc->applyEdgeDetection(((ImpressionistUI*)(o->user_data()))->m_edgeThreshold);
 	((ImpressionistUI*)(o->user_data()))->m_origView->refresh();
+}
+
+void ImpressionistUI::cb_strength_slides(Fl_Widget* o, void* v)
+{
+	((ImpressionistUI*)(o->user_data()))->m_strength = int(((Fl_Slider*)o)->value());
 }
 
 //-----------------------------------------------------------
@@ -673,9 +674,16 @@ void ImpressionistUI::setAlpha(int alpha)
 	m_alpha = alpha;
 }
 
-
 int ImpressionistUI::getEdgeThreshold() {
 	return m_edgeThreshold;
+}
+
+void ImpressionistUI::setStrength(int strength) {
+	m_strength = strength;
+}
+
+int ImpressionistUI::getStrength() {
+	return m_strength;
 }
 
 //-------------------------------------------------
@@ -768,6 +776,7 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Sharpen",	FL_ALT + 's', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_SHARPEN},
   {"Blur",	FL_ALT + 'u', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_BLUR},
   {"Warp",	FL_ALT + 'w', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_WARP},
+  {"Smudge",	FL_ALT + 'z', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_SMUDGE},
   {0}
 };
 
@@ -835,6 +844,7 @@ ImpressionistUI::ImpressionistUI() {
 	m_isEdgeClippingOn = false;
 	m_isEdgeImageLoaded = false;
 	m_edgeThreshold = 255;
+	m_strength = 5;
 
 	m_redVal = 1.0;
 	m_greenVal = 1.0;
@@ -924,6 +934,18 @@ ImpressionistUI::ImpressionistUI() {
 		m_edgeClipLightButton->value(0);
 		m_edgeClipLightButton->callback(cb_edge_clip_light_button);
 		m_edgeClipLightButton->deactivate();
+
+		m_strengthSlider = new Fl_Value_Slider(10, 250, 300, 20, "Strength");
+		m_strengthSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_strengthSlider->type(FL_HOR_NICE_SLIDER);
+		m_strengthSlider->labelfont(FL_COURIER);
+		m_strengthSlider->labelsize(12);
+		m_strengthSlider->minimum(1);
+		m_strengthSlider->maximum(10);
+		m_strengthSlider->step(1);
+		m_strengthSlider->value(m_strength);
+		m_strengthSlider->align(FL_ALIGN_RIGHT);
+		m_strengthSlider->callback(cb_strength_slides);
 
 		m_edgeThresholdSlider = new Fl_Value_Slider(10, 290, 200, 20, "Edge threshold");
 		m_edgeThresholdSlider->user_data((void*)(this));	// record self to be used by static callback functions

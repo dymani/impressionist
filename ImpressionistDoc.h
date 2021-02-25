@@ -47,6 +47,8 @@ public:
 	void updateConvolutionPresetImage(bool isAnotherImage);
 	void setEdgeClipping(bool isEdgeClippingOn);
 	void applyEdgeDetection(int threshold);
+	int getStrength();
+	void setStrength(int strength);
 
 	double	getRedVal();				
 	void	setRedVal(double R);
@@ -91,6 +93,7 @@ public:
 	int m_alpha;
 	bool m_isUsingAnotherGradient;
 	bool m_isEdgeClippingOn;
+	int m_strength;
 
 	double	m_redVal;
 	double	m_greenVal;

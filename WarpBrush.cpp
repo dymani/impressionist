@@ -6,17 +6,17 @@
 #include <imgwarp/imgwarp_mls_rigid.h>
 #include <imgwarp/imgwarp_mls_similarity.h>
 #include <imgwarp/imgwarp_piecewiseaffine.h>
+#include <vector>
+
+const double PI = 3.1415926536;
 
 WarpBrush::WarpBrush(ImpressionistDoc* pDoc, char* name) 
-	: ImpBrush(pDoc, name), m_size(1){
-	m_prev = { -1, -1 };
-	m_kernel = nullptr;
-	m_size = 3;
-
-	m_imageWarp = new ImgWarp_PieceWiseAffine();
-	m_imageWarp->alpha = 255;
-	m_imageWarp->gridSize = 5;
-	((ImgWarp_PieceWiseAffine*)m_imageWarp)->backGroundFillAlg = ImgWarp_PieceWiseAffine::BGMLS;
+	: ImpBrush(pDoc, name), m_size(1) {
+	m_start = { -1, -1 };
+m_imageWarp = new ImgWarp_PieceWiseAffine();
+m_imageWarp->alpha = 255;
+m_imageWarp->gridSize = 5;
+((ImgWarp_PieceWiseAffine*)m_imageWarp)->backGroundFillAlg = ImgWarp_PieceWiseAffine::BGMLS;
 }
 
 void WarpBrush::BrushBegin(const IPoint source, const IPoint target) {
@@ -27,99 +27,106 @@ void WarpBrush::BrushBegin(const IPoint source, const IPoint target) {
 		return;
 	}
 
-	m_prev = { -1, -1 };
+	m_size = pDoc->getSize() * 2;
+	m_strength = pDoc->getStrength();
 
-	m_size = pDoc->getSize();
-	if (m_size % 2 == 0)
-		++m_size;
+	m_start = { target.x, target.y };
 
-	m_anchors.clear();
-	int step = sqrt(m_size) * 30;
-	if (step < 100) step = 100;
-	for (int x = 0; x < pDoc->m_nWidth; x += step) {
-		for (int y = 0; y < pDoc->m_nHeight; y += step) {
-			m_anchors.push_back(cv::Point(x, y));
-		}
-	}
-	if (pDoc->m_nWidth % (step)) {
-		m_anchors.push_back(cv::Point{ pDoc->m_nWidth - 1, 0 });
-		if (pDoc->m_nHeight % (step))
-			m_anchors.push_back(cv::Point{ pDoc->m_nWidth - 1, pDoc->m_nHeight - 1 });
-	}
-	if (pDoc->m_nHeight % (step))
-		m_anchors.push_back(cv::Point{ 0, pDoc->m_nHeight - 1 });
-	
-	if (m_kernel) {
-		delete[] m_kernel;
-		m_kernel = nullptr;
-	}
-	initKernel();	
-	m_prev = target;
-	m_startX = target.x;
-	m_startY = target.y;
 	m_paintingMat = new Mat{ pDoc->m_nHeight, pDoc->m_nWidth, CV_8UC3, pDoc->getPainting() };
 }
 
+cv::Point project(cv::Point distance, cv::Point line) {
+	float proj = distance.x * line.x + distance.y * line.y;
+	if (proj <= 0)
+		return { 0, 0 };
+	proj /= (line.x * line.x + line.y * line.y);
+	return cv::Point{ int(line.x * proj), int(line.y * proj) };
+}
+
+
 void WarpBrush::BrushMove(const IPoint source, const IPoint target) {
-	initKernel();
 	ImpressionistDoc* pDoc = GetDocument();
 
-	if (m_prev.x == -1 && m_prev.y == -1) {
-		m_prev = target;
-		m_startX = target.x;
-		m_startY = target.y;
-		m_paintingMat = new Mat{ pDoc->m_nHeight, pDoc->m_nWidth, CV_8UC3, pDoc->getPainting() };
+	if (m_start.x == -1 && m_start.y == -1) {
+		BrushBegin(source, target);
 		return;
-	}		
+	}
 
 	int width = pDoc->m_nWidth;
 	int height = pDoc->m_nHeight;
 
-	int startX = m_prev.x;
-	int startY = m_prev.y;
-	int targetX = target.x;
-	int targetY = target.y;
+	int Dx = target.x - m_start.x;
+	int Dy = target.y - m_start.y;
+	double dist = sqrt(Dx * Dx + Dy * Dy);
+	double distLimit = m_size / 2.0 * m_strength;
+	if (dist > distLimit) {
+		Dx = Dx * distLimit / dist;
+		Dy = Dy * distLimit / dist;
+	}
 
-	int distX = targetX - startX;
-	int distY = targetY - startY;
+	int left = m_start.x - distLimit * 2;
+	if (left < 0) left = 0;
+	int right = m_start.x + distLimit * 2;
+	if (right >= width) right = width - 1;
+	int top = m_start.y + distLimit * 2;
+	if (top >= height) top = height - 1;
+	int down = m_start.x - distLimit * 2;
+	if (down < 0) down = 0;
 
-	int paintX, paintY;
-	int colorX, colorY;
+	std::vector<cv::Point> anchorBefore;
+	std::vector<cv::Point> anchorAfter;
+	{
+		anchorBefore.push_back(cv::Point{ 0, 0 });
+		anchorBefore.push_back(cv::Point{ 0, height - 1 });
+		anchorBefore.push_back(cv::Point{ width - 1, 0 });
+		anchorBefore.push_back(cv::Point{ width - 1, height - 1 });
 
-	/*glPointSize((float)1);
-	glBegin(GL_POINTS);
-	for (int dx = - m_size / 2; dx <= m_size / 2; ++dx) {
-		paintX = startX + dx;
-		if (paintX < 0 || paintX >= width)
-			continue;
-		for (int dy = -m_size / 2; dy <= m_size / 2; ++dy) {
-			paintY = startY + dy;
-			if (paintY < 0 || paintY >= height)
-				continue;
+		anchorAfter.push_back(cv::Point{ 0, 0 });
+		anchorAfter.push_back(cv::Point{ 0, height - 1 });
+		anchorAfter.push_back(cv::Point{ width - 1, 0 });
+		anchorAfter.push_back(cv::Point{ width - 1, height - 1 });;
+	}
+	{
+		anchorBefore.push_back(cv::Point{ left, top });
+		anchorBefore.push_back(cv::Point{ right, top });
+		anchorBefore.push_back(cv::Point{ left, down });
+		anchorBefore.push_back(cv::Point{ right, down });
 
-			if ((double)dx * dx + (double)dy * dy >= m_size / 2.0 * m_size / 2.0)
-				continue;
-
-			colorX = int(paintX - distX * m_kernel[(dy + m_size / 2) * m_size + dx + m_size / 2]);
-			colorY = int(paintY - distY * m_kernel[(dy + m_size / 2) * m_size + dx + m_size / 2]);
-
-			
-			GLubyte* c = pDoc->getPaintPixel(colorX, colorY);
-			SetColor(c, pDoc->getAlpha());
-			glVertex2d(paintX, paintY);
+		anchorAfter.push_back(cv::Point{ left, top });
+		anchorAfter.push_back(cv::Point{ right, top });
+		anchorAfter.push_back(cv::Point{ left, down });
+		anchorAfter.push_back(cv::Point{ right, down });
+	}
+	{
+		anchorBefore.push_back(m_start);
+		anchorAfter.push_back(m_start + cv::Point{ Dx, Dy });
+	}
+	cv::Point line, proj;
+	int dir;
+	int dot = 0;
+	for (int i = 0; i < 8; ++i) {
+		line = cv::Point{ int(m_size / 2.0 * cos(i * PI / 4)) , int(m_size / 2.0 * sin(i * PI / 4)) };
+		if (line.dot({ Dx, Dy }) > dot) {
+			dir = i;
+			dot = line.dot({ Dx, Dy });
 		}
 	}
-	glEnd();
-	*/
-
-	auto anchor1 = std::vector<cv::Point>(m_anchors);
-	anchor1.push_back({ m_startX, m_startY });
-	auto anchor2 = std::vector<cv::Point>(m_anchors);
-	anchor2.push_back({ targetX, targetY });
+	for (int i = 0; i < 8; ++i) {		
+		if ((i - dir + 8) % 8 <= 1 || (i - dir + 8) % 8 == 7) {
+			line = cv::Point{ int(m_size / 2.0 * cos(dir * PI / 4)) , int(m_size / 2.0 * sin(dir * PI / 4)) };
+			anchorBefore.push_back(m_start + line);
+			anchorAfter.push_back(m_start + line + cv::Point{ Dx, Dy });
+		}
+		else {
+			line = cv::Point{ int(m_size / 2.0 * cos(i * PI / 4)) , int(m_size / 2.0 * sin(i * PI / 4)) };
+			anchorBefore.push_back(m_start + line);
+			anchorAfter.push_back(m_start + line);
+		}
+	}
 
 	Mat result = m_imageWarp->setAllAndGenerate(
 		*m_paintingMat,
-		anchor1, anchor2,
+		anchorBefore, anchorAfter,
 		width, height, 1);
 	GLubyte* c = new unsigned char[3];
 	glDrawBuffer(GL_BACK);
@@ -133,53 +140,9 @@ void WarpBrush::BrushMove(const IPoint source, const IPoint target) {
 		GL_UNSIGNED_BYTE,
 		result.ptr());
 
-
-	//for (int y = 0; y < height; ++y) {
-	//	for (int x = 0; x < width; ++x) {
-	//		cv::Vec3b color = result.at<cv::Vec3b>(y, x);
-	//		c[0] = color[0];
-	//		c[1] = color[1];
-	//		c[2] = color[2];
-	//		SetColor(c, pDoc->getAlpha());
-	//		glVertex2d(x, y);
-	//		/*pDoc->getBitmap()[(y * width + x) * 3 + 0] = color[0];
-	//		pDoc->getBitmap()[(y * width + x) * 3 + 1] = color[1];
-	//		pDoc->getBitmap()[(y * width + x) * 3 + 2] = color[2];*/
-	//	}
-	//}
-
 	delete[] c;
-
-	//pDoc->m_pUI->m_origView->refresh();
-	m_prev = target;
 }
 
 void WarpBrush::BrushEnd(const IPoint source, const IPoint target) {
-}
-
-void WarpBrush::initKernel() {
-	if (m_kernel)
-		return;
-	ImpressionistDoc* pDoc = GetDocument();
-	float sigma = pDoc->getWidth() / 2.0f;
-	if (sigma < 1) sigma = 1;
-	m_kernel = Kernel::generateGaussian(m_size, sigma);
-
-	double center = m_kernel[m_size * m_size / 2];
-	for (int i = 0; i <= m_size / 2; ++i) {
-		for (int j = 0; j <= m_size / 2; ++j) {
-			if (i * i + j * j >= m_size / 2.0 * m_size / 2.0) {
-				m_kernel[(m_size / 2 + i) * m_size + m_size / 2 + j] = 0;
-				m_kernel[(m_size / 2 - i) * m_size + m_size / 2 + j] = 0;
-				m_kernel[(m_size / 2 + i) * m_size + m_size / 2 - j] = 0;
-				m_kernel[(m_size / 2 - i) * m_size + m_size / 2 - j] = 0;
-			}
-		}
-	}
-	for (int i = 0; i < m_size; ++i) {
-		for (int j = 0; j < m_size; ++j) {
-			m_kernel[i * m_size + j] /= center;
-		}
-	}
-	m_kernel[m_size * m_size / 2] = 1;
+	m_start = { -1, -1 };
 }
