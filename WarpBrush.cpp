@@ -13,10 +13,11 @@ const double PI = 3.1415926536;
 WarpBrush::WarpBrush(ImpressionistDoc* pDoc, char* name) 
 	: ImpBrush(pDoc, name), m_size(1) {
 	m_start = { -1, -1 };
-m_imageWarp = new ImgWarp_PieceWiseAffine();
-m_imageWarp->alpha = 255;
-m_imageWarp->gridSize = 5;
-((ImgWarp_PieceWiseAffine*)m_imageWarp)->backGroundFillAlg = ImgWarp_PieceWiseAffine::BGMLS;
+	m_imageWarp = new ImgWarp_PieceWiseAffine();
+	m_imageWarp->alpha = 255;
+	m_imageWarp->gridSize = 5;
+	((ImgWarp_PieceWiseAffine*)m_imageWarp)->backGroundFillAlg = ImgWarp_PieceWiseAffine::BGMLS;
+	m_paintingCopy = nullptr;
 }
 
 void WarpBrush::BrushBegin(const IPoint source, const IPoint target) {
@@ -32,7 +33,10 @@ void WarpBrush::BrushBegin(const IPoint source, const IPoint target) {
 
 	m_start = { target.x, target.y };
 
-	m_paintingMat = new Mat{ pDoc->m_nHeight, pDoc->m_nWidth, CV_8UC3, pDoc->getPainting() };
+	if (m_paintingCopy) delete[] m_paintingCopy;
+	m_paintingCopy = new unsigned char[pDoc->m_nWidth * pDoc->m_nHeight * 3];
+	memcpy(m_paintingCopy, pDoc->getPainting(), pDoc->m_nWidth * pDoc->m_nHeight * 3);
+	m_paintingMat = new Mat{ pDoc->m_nHeight, pDoc->m_nWidth, CV_8UC3, m_paintingCopy };
 }
 
 cv::Point project(cv::Point distance, cv::Point line) {

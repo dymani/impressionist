@@ -19,6 +19,7 @@ protected:
 
 	ImgWarp_MLS* m_imageWarp;
 	cv::Mat* m_paintingMat;
+	unsigned char* m_paintingCopy;
 };
 
 #endif

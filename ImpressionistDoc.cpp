@@ -48,6 +48,7 @@ ImpressionistDoc::ImpressionistDoc()
 	m_isUsingAnotherGradient = false;
 	m_ucEdgeImage = nullptr;
 	m_isEdgeClippingOn = false;
+	m_ucViewImage = nullptr;
 
 
 	// create one instance of each brush
@@ -124,8 +125,33 @@ unsigned char* ImpressionistDoc::getEdgeImage() {
 	return m_ucEdgeImage;
 }
 
+unsigned char* ImpressionistDoc::getViewImage() {
+	return m_ucViewImage;
+}
+
+void ImpressionistDoc::updateViewImage() {
+	bool needBlend;
+	for (int i = 0; i < m_nHeight * m_nWidth; i++) {
+			needBlend = (m_ucPainting[i  * 3] == 0)
+					&& (m_ucPainting[i * 3 + 1] == 0)
+					&& (m_ucPainting[i * 3 + 2] == 0);
+			if (needBlend) {
+				m_ucViewImage[i * 3] = m_ucBitmap[i * 3] * m_pUI->getBlendViewAlpha();
+				m_ucViewImage[i * 3 + 1] = m_ucBitmap[i * 3 + 1] * m_pUI->getBlendViewAlpha();
+				m_ucViewImage[i * 3 + 2] = m_ucBitmap[i * 3 + 2] * m_pUI->getBlendViewAlpha();
+			}
+			else {
+				m_ucViewImage[i * 3] = m_ucPainting[i * 3];
+				m_ucViewImage[i * 3 + 1] = m_ucPainting[i * 3 + 1];
+				m_ucViewImage[i * 3 + 2] = m_ucPainting[i * 3 + 2];
+			}
+	}
+}
+
 void ImpressionistDoc::setPainting(unsigned char* p) {
 	m_ucPainting = p;
+	updateViewImage();
+	m_pUI->m_paintView->refresh();
 }
 
 //---------------------------------------------------------
@@ -299,6 +325,7 @@ int ImpressionistDoc::loadImage(char *iname)
 	if ( m_ucPainting ) delete [] m_ucPainting;
 	if (m_ucPaintingUndo) delete[] m_ucPaintingUndo;
 	if (m_ucAnotherImage) delete[] m_ucAnotherImage;
+	if (m_ucViewImage) delete[] m_ucViewImage;
 
 	m_ucBitmap		= data;
 
@@ -309,6 +336,9 @@ int ImpressionistDoc::loadImage(char *iname)
 	// allocate space for undo memory
 	m_ucPaintingUndo = new unsigned char[width * height * 3];
 	memset(m_ucPaintingUndo, 0, width * height * 3);
+
+	m_ucViewImage = new unsigned char[width * height * 3];
+	updateViewImage();
 
 	m_ucAnotherImage = nullptr;
 	m_isUsingAnotherGradient = false;
@@ -362,6 +392,7 @@ int ImpressionistDoc::clearCanvas()
 		// allocate space for draw view
 		m_ucPainting	= new unsigned char [m_nPaintWidth*m_nPaintHeight*3];
 		memset(m_ucPainting, 0, m_nPaintWidth*m_nPaintHeight*3);
+		updateViewImage();
 
 		// refresh paint view as well	
 		m_pUI->m_paintView->refresh();
@@ -375,6 +406,7 @@ int ImpressionistDoc::swapContents() {
 	unsigned char* temp = m_ucPainting;
 	m_ucPainting = m_ucBitmap;
 	m_ucBitmap = temp;
+	updateViewImage();
 	m_pUI->m_origView->refresh();
 	m_pUI->m_paintView->refresh();
 	updateConvolutionPresetImage(m_isUsingAnotherGradient);
@@ -404,7 +436,9 @@ int ImpressionistDoc::changeImage(char* iname) {
 	// release old storage
 	if (m_ucBitmap) delete[] m_ucBitmap;
 	m_ucBitmap = data;
+	updateViewImage();
 
+	m_pUI->m_paintView->refresh();
 	// display it on origView
 	m_pUI->m_origView->resizeWindow(width, height);
 	m_pUI->m_origView->refresh();
@@ -477,6 +511,7 @@ int ImpressionistDoc::loadDissolveImage(char* name) {
 			}
 		}
 	}
+	updateViewImage();
 
 	//refresh display
 	m_pUI->m_paintView->refresh();
@@ -524,10 +559,12 @@ int ImpressionistDoc::applyFilter(int filterType, int filterSource, bool isNorma
 	else {
 		result = m_convolutionManager->generateFilterImage(ConvolutionManager::FilterChoice(filterType), m_ucPainting, m_nWidth, m_nHeight, isNormalized);
 	}
-	
+
+	m_pUI->m_paintView->saveUndo();
 	for (int i = 0; i < m_nPaintWidth * m_nPaintHeight * 3; ++i) {
 		m_ucPainting[i] = result[i];
 	}
+	updateViewImage();
 	m_pUI->m_paintView->refresh();
 	delete[] result;
 	return 1;
@@ -549,9 +586,11 @@ int ImpressionistDoc::applyCustomFilter(int kernel[], int width, int height, int
 	else {
 		result = m_convolutionManager->generateCustomFilterImage(kern, width, height, m_ucBitmap, m_nWidth, m_nHeight, isNormalized);
 	}
+	m_pUI->m_paintView->saveUndo();
 	for (int i = 0; i < m_nPaintWidth * m_nPaintHeight * 3; ++i) {
 		m_ucPainting[i] = result[i];
 	}
+	updateViewImage();
 	m_pUI->m_paintView->refresh();
 	delete[] kern;
 	delete[] result;

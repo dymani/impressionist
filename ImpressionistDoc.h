@@ -74,12 +74,16 @@ private:
 	unsigned char* m_ucAnotherImage;
 	unsigned char* m_ucDissolveImage;
 	unsigned char* m_ucEdgeImage;
+	unsigned char* m_ucViewImage;
 public:
 	unsigned char* getBitmap();
 	unsigned char* getPainting();
 	unsigned char* getAnotherImage();
 	unsigned char* getDissolveImage();
 	unsigned char* getEdgeImage();
+	unsigned char* getViewImage();
+
+	void updateViewImage();
 
 	void setPainting(unsigned char* p);
 	unsigned char* m_ucPaintingUndo;
