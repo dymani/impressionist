@@ -63,6 +63,7 @@ void WarpBrush::BrushMove(const IPoint source, const IPoint target) {
 	int Dy = target.y - m_start.y;
 	double dist = sqrt(Dx * Dx + Dy * Dy);
 	double distLimit = m_size / 2.0 * m_strength;
+	double theta = atan2(Dy, Dx);
 	if (dist > distLimit) {
 		Dx = Dx * distLimit / dist;
 		Dy = Dy * distLimit / dist;
@@ -106,7 +107,7 @@ void WarpBrush::BrushMove(const IPoint source, const IPoint target) {
 		anchorAfter.push_back(m_start + cv::Point{ Dx, Dy });
 	}
 	cv::Point line, proj;
-	int dir;
+	/*int dir;
 	int dot = 0;
 	for (int i = 0; i < 8; ++i) {
 		line = cv::Point{ int(m_size / 2.0 * cos(i * PI / 4)) , int(m_size / 2.0 * sin(i * PI / 4)) };
@@ -114,18 +115,14 @@ void WarpBrush::BrushMove(const IPoint source, const IPoint target) {
 			dir = i;
 			dot = line.dot({ Dx, Dy });
 		}
-	}
-	for (int i = 0; i < 8; ++i) {		
-		if ((i - dir + 8) % 8 <= 1 || (i - dir + 8) % 8 == 7) {
-			line = cv::Point{ int(m_size / 2.0 * cos(dir * PI / 4)) , int(m_size / 2.0 * sin(dir * PI / 4)) };
-			anchorBefore.push_back(m_start + line);
-			anchorAfter.push_back(m_start + line + cv::Point{ Dx, Dy });
-		}
-		else {
-			line = cv::Point{ int(m_size / 2.0 * cos(i * PI / 4)) , int(m_size / 2.0 * sin(i * PI / 4)) };
-			anchorBefore.push_back(m_start + line);
-			anchorAfter.push_back(m_start + line);
-		}
+	}*/
+	for (int i = 0; i < 8; ++i) {
+		line = cv::Point{ int(m_size / 2.0 * cos(i * PI / 4)) , int(m_size / 2.0 * sin(i * PI / 4)) };
+		anchorBefore.push_back(m_start + line);
+		double angle = i * PI / 4 - theta;
+		if (angle >= PI) angle -= 2 * PI;
+		if (angle <= -PI) angle += 2 * PI;
+		anchorAfter.push_back(m_start + line + cv::Point{ int(Dx / cosh(angle)), int(Dy / cosh(angle)) });
 	}
 
 	Mat result = m_imageWarp->setAllAndGenerate(
