@@ -24,6 +24,7 @@
 #include "BlurBrush.h"
 #include "WarpBrush.h"
 #include "SmudgeBrush.h"
+#include "AlphaMappedBrush.h"
 
 #include "LineOverlay.h"
 #include "InputTable.h"
@@ -80,6 +81,8 @@ ImpressionistDoc::ImpressionistDoc()
 		= new WarpBrush(this, "Warp");
 	ImpBrush::c_pBrushes[BRUSH_SMUDGE]
 		= new SmudgeBrush(this, "Smudge");
+	ImpBrush::c_pBrushes[BRUSH_ALPHA]
+		= new AlphaMappedBrush(this, "Alpha map");
 
 	// make one of the brushes current
 	m_pCurrentBrush	= ImpBrush::c_pBrushes[0];	
@@ -543,6 +546,20 @@ int ImpressionistDoc::loadEdgeImage(char* name) {
 	if (m_ucEdgeImage) delete[] m_ucEdgeImage;
 	m_ucEdgeImage = data;
 
+	return 1;
+}
+
+int ImpressionistDoc::loadAlphaBrushImage(char* name) {
+	unsigned char* data;
+	int width, height;
+
+	if ((data = readBMP(name, width, height)) == NULL)
+	{
+		fl_alert("Can't load bitmap file");
+		return 0;
+	}
+	// release old storage
+	dynamic_cast<AlphaMappedBrush*>(ImpBrush::c_pBrushes[BRUSH_ALPHA])->updateAlphaMap(data, width, height);
 	return 1;
 }
 

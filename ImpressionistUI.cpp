@@ -339,6 +339,7 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 
 
 	pDoc->setBrushType(pUI->m_brushType);
+	pUI->m_BrushSizeSlider->activate();
 
 	// Check if certain attributes are available for certain brush types
 	if (pUI->m_brushType == BRUSH_LINES || pUI->m_brushType == BRUSH_SCATTERED_LINES) {
@@ -353,6 +354,15 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 		pUI->m_strengthSlider->deactivate();
 	}
 	else if (pUI->m_brushType == BRUSH_WARP || pUI->m_brushType == BRUSH_SMUDGE) {
+		pUI->m_strokeDirectionChoice->deactivate();
+		pUI->m_LineWidthSlider->deactivate();
+		pUI->m_LineAngleSlider->deactivate();
+		pUI->m_anotherGradientLightButton->deactivate();
+		pUI->m_edgeClipLightButton->deactivate();
+		pUI->m_strengthSlider->activate();
+	}
+	else if (pUI->m_brushType == BRUSH_ALPHA) {
+		pUI->m_BrushSizeSlider->deactivate();
 		pUI->m_strokeDirectionChoice->deactivate();
 		pUI->m_LineWidthSlider->deactivate();
 		pUI->m_LineAngleSlider->deactivate();
@@ -496,6 +506,14 @@ void ImpressionistUI::cb_load_dissolve_image(Fl_Menu_* o, void* v) {
 			pDoc->loadDissolveImage(newfile);
 		}
 		whoami(o)->m_paintView->refresh();
+	}
+}
+
+void ImpressionistUI::cb_load_alpha_brush_image(Fl_Menu_* o, void* v) {
+	ImpressionistDoc* pDoc = whoami(o)->getDocument();
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		pDoc->loadAlphaBrushImage(newfile);
 	}
 }
 
@@ -768,6 +786,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "Load a&nother image...", FL_ALT + 'n', (Fl_Callback*)ImpressionistUI::cb_load_another_image},
 		{ "Load &edge image...", FL_ALT + 'e', (Fl_Callback*)ImpressionistUI::cb_load_edge_image, 0, FL_MENU_DIVIDER },
 		{ "Load &dissolve image...", FL_ALT + 'd', (Fl_Callback*)ImpressionistUI::cb_load_dissolve_image },
+		{ "Load alpha brush image...", FL_ALT + 'v', (Fl_Callback*)ImpressionistUI::cb_load_alpha_brush_image },
 		{ "&Filters...", FL_ALT + 'f', (Fl_Callback*)ImpressionistUI::cb_filters, 0, FL_MENU_DIVIDER },
 
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
@@ -798,6 +817,7 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Blur",	FL_ALT + 'u', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_BLUR},
   {"Warp",	FL_ALT + 'w', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_WARP},
   {"Smudge",	FL_ALT + 'z', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_SMUDGE},
+  {"Alpha Map",	FL_ALT + 'v', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_ALPHA},
   {0}
 };
 

@@ -30,6 +30,7 @@ public:
 	int loadAnotherImage(char* name);
 	int loadDissolveImage(char* name);
 	int loadEdgeImage(char* name);
+	int loadAlphaBrushImage(char* name);
 
 	int applyFilter(int filterType, int filterSource, bool isNormalized);
 	int applyCustomFilter(int kernel[], int width, int height, int filterSource, bool isNormalized);

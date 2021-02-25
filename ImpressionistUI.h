@@ -159,6 +159,7 @@ private:
 	static void cb_load_another_image(Fl_Menu_* o, void* v);
 	static void cb_load_edge_image(Fl_Menu_* o, void* v);
 	static void cb_load_dissolve_image(Fl_Menu_* o, void* v);
+	static void cb_load_alpha_brush_image(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
 	static void	cb_filters(Fl_Menu_* o, void* v);
