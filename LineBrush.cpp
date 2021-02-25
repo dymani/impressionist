@@ -13,7 +13,7 @@ LineBrush::LineBrush(ImpressionistDoc* pDoc, char* name)
 	: ImpBrush(pDoc, name), m_size(1), m_width(1), m_angle(0), m_mode(Mode::SLIDER) {
 }
 
-void LineBrush::BrushBegin(const Point source, const Point target) {
+void LineBrush::BrushBegin(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 
 	// save mouse location
@@ -27,7 +27,7 @@ void LineBrush::BrushBegin(const Point source, const Point target) {
 		BrushMove(source, target);
 }
 
-void LineBrush::BrushMove(const Point source, const Point target) {
+void LineBrush::BrushMove(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 
 	if (pDoc == NULL) {
@@ -50,7 +50,7 @@ void LineBrush::BrushMove(const Point source, const Point target) {
 	drawLine(source, target);
 }
 
-void LineBrush::BrushEnd(const Point source, const Point target) {
+void LineBrush::BrushEnd(const IPoint source, const IPoint target) {
 	m_prevTargets.clear();
 }
 
@@ -58,7 +58,7 @@ inline GLubyte getLuma(const GLubyte color[]) {
 	return GLubyte(0.299 * color[0] + 0.587 * color[1] + 0.114 * color[2]);
 }
 
-void LineBrush::updateAttributes(const Point source, const Point target) {
+void LineBrush::updateAttributes(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 
 	m_size = pDoc->getSize();
@@ -86,14 +86,14 @@ void LineBrush::updateAttributes(const Point source, const Point target) {
 
 int LineBrush::angleRegression() {
 	double xBar = 0, yBar = 0;
-	for (Point& p : m_prevTargets) {
+	for (IPoint& p : m_prevTargets) {
 		xBar += p.x;
 		yBar += p.y;
 	}
 	xBar = xBar / m_prevTargets.size();
 	yBar = yBar / m_prevTargets.size();
 	double sXY = 0, sX2 = 0, sY2 = 0;
-	for (Point& p : m_prevTargets) {
+	for (IPoint& p : m_prevTargets) {
 		sXY += (p.x - xBar) * (p.y - yBar);
 		sX2 += (p.x - xBar) * (p.x - xBar);
 		sY2 += (p.y - yBar) * (p.y - yBar);
@@ -108,7 +108,7 @@ int LineBrush::angleRegression() {
 		return int(atan2(sXY, sX2) * 180 / PI);
 }
 
-void LineBrush::drawLine(const Point source, const Point target) {
+void LineBrush::drawLine(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 	if (pDoc->m_isEdgeClippingOn) {
 		GLubyte color[3];

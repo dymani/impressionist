@@ -50,6 +50,7 @@ public:
 	Fl_Slider*			m_LineWidthSlider;
 	Fl_Slider*			m_LineAngleSlider;
 	Fl_Slider*			m_AlphaSlider;
+	Fl_Slider* m_strengthSlider;
 
 	Fl_Light_Button* m_anotherGradientLightButton;
 	Fl_Light_Button* m_edgeClipLightButton;
@@ -91,6 +92,8 @@ public:
 	int					getAlpha();
 	void				setAlpha(int alpha);
 	int getEdgeThreshold();
+	int getStrength();
+	void setStrength(int strength);
 	
 	double				getRedVal();
 	void				setRedVal(double R);
@@ -113,6 +116,7 @@ private:
 	bool m_isEdgeClippingOn;
 	bool m_isEdgeImageLoaded;
 	int m_edgeThreshold;
+	int m_strength;
 
 
 	double	m_redVal;
@@ -165,6 +169,7 @@ private:
 	static void cb_edge_clip_light_button(Fl_Widget* o, void* v);
 	static void cb_edge_threshold_slides(Fl_Widget* o, void* v);
 	static void	cb_edge_detection_button(Fl_Widget* o, void* v);
+	static void cb_strength_slides(Fl_Widget* o, void* v);
 
 	static void cb_color_chooser(Fl_Widget* o, void* v);
 

@@ -13,7 +13,7 @@ LineOverlay::LineOverlay()
 	: m_size(1), m_angle(0), m_validBrush(false) {
 }
 
-void LineOverlay::setStart(const Point target) {
+void LineOverlay::setStart(const IPoint target) {
 	if (!m_pDoc) return;
 	m_validBrush = false;
 
@@ -26,7 +26,7 @@ void LineOverlay::setStart(const Point target) {
 	}
 }
 
-void LineOverlay::draw(const Point target) {
+void LineOverlay::draw(const IPoint target) {
 	if (!m_pDoc) return;
 	if (!m_validBrush) return;
 	
@@ -43,7 +43,7 @@ void LineOverlay::draw(const Point target) {
 	glEnd();
 }
 
-void LineOverlay::release(const Point target) {
+void LineOverlay::release(const IPoint target) {
 	if (!m_pDoc) return;
 	if (m_validBrush) {
 		m_pDoc->setSize(m_size);

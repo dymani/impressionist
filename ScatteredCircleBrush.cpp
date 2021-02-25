@@ -16,7 +16,7 @@ ScatteredCircleBrush::ScatteredCircleBrush(ImpressionistDoc* pDoc, char* name) :
 {
 }
 
-void ScatteredCircleBrush::BrushBegin(const Point source, const Point target)
+void ScatteredCircleBrush::BrushBegin(const IPoint source, const IPoint target)
 {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg = pDoc->m_pUI;
@@ -28,7 +28,7 @@ void ScatteredCircleBrush::BrushBegin(const Point source, const Point target)
 	BrushMove(source, target);
 }
 
-void ScatteredCircleBrush::BrushMove(const Point source, const Point target)
+void ScatteredCircleBrush::BrushMove(const IPoint source, const IPoint target)
 {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg = pDoc->m_pUI;
@@ -50,16 +50,16 @@ void ScatteredCircleBrush::BrushMove(const Point source, const Point target)
 
 		// Generate circle according to parity of size
 		if (pDoc->getSize() % 2 == 0) {
-			CircleBrush::MakeCircle(pDoc, Point(source.x + dx, source.y + dy), Point(target.x + dx, target.y + dy), r, true);
+			CircleBrush::MakeCircle(pDoc, IPoint(source.x + dx, source.y + dy), IPoint(target.x + dx, target.y + dy), r, true);
 		}
 		else {
-			CircleBrush::MakeCircle(pDoc, Point(source.x + dx, source.y + dy), Point(target.x + dx, target.y + dy), r, false);
+			CircleBrush::MakeCircle(pDoc, IPoint(source.x + dx, source.y + dy), IPoint(target.x + dx, target.y + dy), r, false);
 		}
 	}
 }
 
 
-void ScatteredCircleBrush::BrushEnd(const Point source, const Point target)
+void ScatteredCircleBrush::BrushEnd(const IPoint source, const IPoint target)
 {
 	// do nothing so far
 }

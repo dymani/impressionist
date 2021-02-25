@@ -8,12 +8,12 @@ class ImpressionistDoc;
 class Marker {
 public:
 	Marker();
-	void update(const Point source);
+	void update(const IPoint source);
 	void draw(int yOffset);
 	ImpressionistDoc* m_pDoc;
 private:
 	const int SIZE = 4;
-	Point m_source;
+	IPoint m_source;
 };
 
 #endif

@@ -22,6 +22,7 @@ enum
 	BRUSH_SHARPEN,
 	BRUSH_BLUR,
 	BRUSH_WARP,
+	BRUSH_SMUDGE,
 
 	NUM_BRUSH_TYPE // Make sure this stays at the end!
 };
@@ -29,11 +30,11 @@ enum
 
 class ImpressionistDoc; // Pre-declaring class
 
-class Point 
+class IPoint 
 {
 public:
-	Point() {};
-	Point(int xx, int yy) { x = xx; y = yy; };
+	IPoint() {};
+	IPoint(int xx, int yy) { x = xx; y = yy; };
 
 	int x, y;
 };
@@ -45,12 +46,12 @@ protected:
 
 public:
 	// The implementation of your brush should realize these virtual functions
-	virtual void BrushBegin( const Point source, const Point target ) = 0;
-	virtual void BrushMove( const Point source, const Point target ) = 0;
-	virtual void BrushEnd( const Point source, const Point target ) = 0;
+	virtual void BrushBegin( const IPoint source, const IPoint target ) = 0;
+	virtual void BrushMove( const IPoint source, const IPoint target ) = 0;
+	virtual void BrushEnd( const IPoint source, const IPoint target ) = 0;
 
 	// according to the source image and the position, determine the draw color
-	void SetColor( const Point source, int alpha );
+	void SetColor( const IPoint source, int alpha );
 	void SetColor(unsigned char* color3, int alpha);
 
 	// get Doc to communicate with it

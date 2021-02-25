@@ -21,14 +21,13 @@
 #define MOUSE_MOVE_			7
 
 
-#ifndef WIN32
 #define min(a, b)	( ( (a)<(b) ) ? (a) : (b) )
 #define max(a, b)	( ( (a)>(b) ) ? (a) : (b) )
-#endif
+
 
 static int		eventToDo;
 static int		isAnEvent=0;
-static Point	coord;
+static IPoint	coord;
 
 PaintView::PaintView(int			x, 
 					 int			y, 
@@ -65,7 +64,7 @@ void PaintView::draw()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	Point scrollpos;// = GetScrollPosition();
+	IPoint scrollpos;// = GetScrollPosition();
 	scrollpos.x = 0;
 	scrollpos.y	= 0;
 
@@ -102,8 +101,8 @@ void PaintView::draw()
 		// Clear it after processing.
 		isAnEvent	= 0;	
 
-		Point source( coord.x + m_nStartCol, m_nEndRow - coord.y );
-		Point target( coord.x, m_nWindowHeight - coord.y );
+		IPoint source( coord.x + m_nStartCol, m_nEndRow - coord.y );
+		IPoint target( coord.x, m_nWindowHeight - coord.y );
 		
 		// This is the event handler
 		switch (eventToDo) 
@@ -225,7 +224,7 @@ int PaintView::handle(int event)
 				int startrow = m_pDoc->m_nPaintHeight - (drawHeight);
 				if (startrow < 0) startrow = 0;
 
-				Point source(coord.x, startrow + drawHeight - coord.y);
+				IPoint source(coord.x, startrow + drawHeight - coord.y);
 				m_pDoc->m_pUI->m_marker->update(source);
 				m_pDoc->m_pUI->m_origView->refresh();
 			}			

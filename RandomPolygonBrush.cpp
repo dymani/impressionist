@@ -16,7 +16,7 @@ RandomPolygonBrush::RandomPolygonBrush(ImpressionistDoc* pDoc, char* name) :
 {
 }
 
-void RandomPolygonBrush::BrushBegin(const Point source, const Point target)
+void RandomPolygonBrush::BrushBegin(const IPoint source, const IPoint target)
 {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg = pDoc->m_pUI;
@@ -29,7 +29,7 @@ void RandomPolygonBrush::BrushBegin(const Point source, const Point target)
 	BrushMove(source, target);
 }
 
-void RandomPolygonBrush::BrushMove(const Point source, const Point target)
+void RandomPolygonBrush::BrushMove(const IPoint source, const IPoint target)
 {
 	ImpressionistDoc* pDoc = GetDocument();
 	ImpressionistUI* dlg = pDoc->m_pUI;
@@ -62,7 +62,7 @@ void RandomPolygonBrush::BrushMove(const Point source, const Point target)
 }
 
 
-void RandomPolygonBrush::BrushEnd(const Point source, const Point target)
+void RandomPolygonBrush::BrushEnd(const IPoint source, const IPoint target)
 {
 	// do nothing so far
 }
