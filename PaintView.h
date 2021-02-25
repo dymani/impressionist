@@ -20,6 +20,9 @@ class PaintView : public Fl_Gl_Window
 public:
 	PaintView(int x, int y, int w, int h, const char* l);
 	void draw();
+	void drawView();
+	void drawPainting();
+
 	int handle(int event);
 
 	void saveUndo();
@@ -47,7 +50,9 @@ public:
 	}
 
 private:
-	GLvoid* m_pPaintBitstart;
+	GLvoid* m_pPaintingBitstart;
+
+	IPoint m_scrollpos;
 	int		m_nDrawWidth,
 			m_nDrawHeight,
 			m_nStartRow, 
@@ -55,7 +60,8 @@ private:
 			m_nStartCol, 
 			m_nEndCol,
 			m_nWindowWidth, 
-			m_nWindowHeight;
+			m_nWindowHeight,
+		    m_startrow;
 
 };
 

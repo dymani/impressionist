@@ -64,9 +64,8 @@ void PaintView::draw()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
-	IPoint scrollpos;// = GetScrollPosition();
-	scrollpos.x = 0;
-	scrollpos.y	= 0;
+	m_scrollpos.x = 0;
+	m_scrollpos.y	= 0;
 
 	m_nWindowWidth	= w();
 	m_nWindowHeight	= h();
@@ -75,26 +74,27 @@ void PaintView::draw()
 	drawWidth = min( m_nWindowWidth, m_pDoc->m_nPaintWidth );
 	drawHeight = min( m_nWindowHeight, m_pDoc->m_nPaintHeight );
 
-	int startrow = m_pDoc->m_nPaintHeight - (scrollpos.y + drawHeight);
-	if ( startrow < 0 ) startrow = 0;
+	m_startrow = m_pDoc->m_nPaintHeight - (m_scrollpos.y + drawHeight);
+	if ( m_startrow < 0 ) m_startrow = 0;
 
-	m_pPaintBitstart = m_pDoc->getPainting() + 
-		3 * ((m_pDoc->m_nPaintWidth * startrow) + scrollpos.x);
+	m_pPaintingBitstart = m_pDoc->getPainting() + 
+		3 * ((m_pDoc->m_nPaintWidth * m_startrow) + m_scrollpos.x);
 
 	m_nDrawWidth	= drawWidth;
 	m_nDrawHeight	= drawHeight;
 
-	m_nStartRow		= startrow;
-	m_nEndRow		= startrow + drawHeight;
-	m_nStartCol		= scrollpos.x;
+	m_nStartRow		= m_startrow;
+	m_nEndRow		= m_startrow + drawHeight;
+	m_nStartCol		= m_scrollpos.x;
 	m_nEndCol		= m_nStartCol + drawWidth;
 
 	if ( m_pDoc->getPainting() && !isAnEvent)
 	{
 		RestoreContent();
-
+		m_pDoc->updateViewImage();
+		drawView();
 	}
-
+	bool save = false;
 	if ( m_pDoc->getPainting() && isAnEvent)
 	{
 
@@ -108,37 +108,52 @@ void PaintView::draw()
 		switch (eventToDo) 
 		{
 		case LEFT_MOUSE_DOWN:
+			drawPainting();
 			saveUndo();
 			m_pDoc->m_pCurrentBrush->BrushBegin( source, target );
 			m_pDoc->m_pUI->m_marker->update(source);
 			m_pDoc->m_pUI->m_origView->refresh();
+			m_pDoc->updateViewImage();
+			drawView();
 			break;
 		case LEFT_MOUSE_DRAG:
+			drawPainting();
 			m_pDoc->m_pCurrentBrush->BrushMove( source, target );
 			m_pDoc->m_pUI->m_marker->update(source);
 			m_pDoc->m_pUI->m_origView->refresh();
+			SaveCurrentContent();
+			m_pDoc->updateViewImage();
+			drawView();
 			break;
 		case LEFT_MOUSE_UP:
 			m_pDoc->m_pCurrentBrush->BrushEnd( source, target );
 			m_pDoc->m_pUI->m_marker->update(source);
 			m_pDoc->m_pUI->m_origView->refresh();
+			drawPainting();
 			SaveCurrentContent();
 			RestoreContent();
+			save = true;
 			break;
 		case RIGHT_MOUSE_DOWN:
+			m_pDoc->updateViewImage();
+			drawView();
 			m_pDoc->m_pUI->m_lineOverlay->setStart(target);
 			m_pDoc->m_pUI->m_marker->update(source);
 			m_pDoc->m_pUI->m_origView->refresh();
 			break;
 		case RIGHT_MOUSE_DRAG:
-			RestoreContent();
+			drawPainting();
+			m_pDoc->updateViewImage();
+			drawView();
 			m_pDoc->m_pUI->m_lineOverlay->draw(target);
 			m_pDoc->m_pUI->m_marker->update(source);
 			m_pDoc->m_pUI->m_origView->refresh();
 			break;
 		case RIGHT_MOUSE_UP:
+			drawPainting();
+			m_pDoc->updateViewImage();
+			drawView();
 			m_pDoc->m_pUI->m_lineOverlay->release(target);
-			RestoreContent();
 			m_pDoc->m_pUI->m_marker->update(source);
 			m_pDoc->m_pUI->m_origView->refresh();
 			break;
@@ -173,8 +188,29 @@ void PaintView::draw()
 	glDrawBuffer(GL_BACK);
 	#endif // !MESA
 
+	if (save) {
+		SaveCurrentContent();
+		glFlush();
+		m_pDoc->updateViewImage();
+		drawView();
+	}
+
 }
 
+void PaintView::drawView() {
+	m_pPaintingBitstart = m_pDoc->getViewImage() +
+		3 * ((m_pDoc->m_nPaintWidth * m_startrow) + m_scrollpos.x);
+	RestoreContent();
+	m_pPaintingBitstart = m_pDoc->getPainting() +
+		3 * ((m_pDoc->m_nPaintWidth * m_startrow) + m_scrollpos.x);
+}
+
+void PaintView::drawPainting() {
+	m_pPaintingBitstart = m_pDoc->getPainting()+
+		3 * ((m_pDoc->m_nPaintWidth * m_startrow) + m_scrollpos.x);
+	RestoreContent();
+	glFlush();
+}
 
 int PaintView::handle(int event)
 {
@@ -221,10 +257,10 @@ int PaintView::handle(int event)
 				drawWidth = min(m_nWindowWidth, m_pDoc->m_nPaintWidth);
 				drawHeight = min(m_nWindowHeight, m_pDoc->m_nPaintHeight);
 
-				int startrow = m_pDoc->m_nPaintHeight - (drawHeight);
-				if (startrow < 0) startrow = 0;
+				int m_startrow = m_pDoc->m_nPaintHeight - (drawHeight);
+				if (m_startrow < 0) m_startrow = 0;
 
-				IPoint source(coord.x, startrow + drawHeight - coord.y);
+				IPoint source(coord.x, m_startrow + drawHeight - coord.y);
 				m_pDoc->m_pUI->m_marker->update(source);
 				m_pDoc->m_pUI->m_origView->refresh();
 			}			
@@ -254,6 +290,7 @@ void PaintView::saveUndo()
 
 void PaintView::refresh()
 {
+	m_pDoc->updateViewImage();
 	redraw();
 }
 
@@ -266,7 +303,7 @@ void PaintView::SaveCurrentContent()
 {
 	// Tell openGL to read from the front buffer when capturing
 	// out paint strokes
-	glReadBuffer(GL_FRONT);
+	glReadBuffer(GL_BACK);
 
 	glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 	glPixelStorei( GL_PACK_ROW_LENGTH, m_pDoc->m_nPaintWidth );
@@ -277,7 +314,7 @@ void PaintView::SaveCurrentContent()
 				  m_nDrawHeight, 
 				  GL_RGB, 
 				  GL_UNSIGNED_BYTE, 
-				  m_pPaintBitstart );
+				  m_pPaintingBitstart );
 }
 
 
@@ -294,7 +331,7 @@ void PaintView::RestoreContent()
 				  m_nDrawHeight, 
 				  GL_RGB, 
 				  GL_UNSIGNED_BYTE, 
-				  m_pPaintBitstart);
+				  m_pPaintingBitstart);
 
 //	glDrawBuffer(GL_FRONT);
 }

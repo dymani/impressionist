@@ -283,6 +283,7 @@ void ImpressionistUI::cb_exit(Fl_Menu_* o, void* v)
 	whoami(o)->m_mainWindow->hide();
 	whoami(o)->m_brushDialog->hide();
 	whoami(o)->m_filterDialog->hide();
+	whoami(o)->m_blendViewDialog->hide();
 
 }
 
@@ -318,6 +319,10 @@ void ImpressionistUI::cb_view_edge(Fl_Menu_* o, void* v) {
 	whoami(o)->m_origView->setView(OriginalView::EDGE);
 }
 
+void ImpressionistUI::cb_blend_view(Fl_Menu_* o, void* v) {
+	whoami(o)->m_blendViewDialog->show();
+}
+
 
 //------- UI should keep track of the current for all the controls for answering the query from Doc ---------
 //-------------------------------------------------------------
@@ -334,6 +339,7 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 
 
 	pDoc->setBrushType(pUI->m_brushType);
+	pUI->m_BrushSizeSlider->activate();
 
 	// Check if certain attributes are available for certain brush types
 	if (pUI->m_brushType == BRUSH_LINES || pUI->m_brushType == BRUSH_SCATTERED_LINES) {
@@ -348,6 +354,15 @@ void ImpressionistUI::cb_brushChoice(Fl_Widget* o, void* v)
 		pUI->m_strengthSlider->deactivate();
 	}
 	else if (pUI->m_brushType == BRUSH_WARP || pUI->m_brushType == BRUSH_SMUDGE) {
+		pUI->m_strokeDirectionChoice->deactivate();
+		pUI->m_LineWidthSlider->deactivate();
+		pUI->m_LineAngleSlider->deactivate();
+		pUI->m_anotherGradientLightButton->deactivate();
+		pUI->m_edgeClipLightButton->deactivate();
+		pUI->m_strengthSlider->activate();
+	}
+	else if (pUI->m_brushType == BRUSH_ALPHA) {
+		pUI->m_BrushSizeSlider->deactivate();
 		pUI->m_strokeDirectionChoice->deactivate();
 		pUI->m_LineWidthSlider->deactivate();
 		pUI->m_LineAngleSlider->deactivate();
@@ -494,6 +509,14 @@ void ImpressionistUI::cb_load_dissolve_image(Fl_Menu_* o, void* v) {
 	}
 }
 
+void ImpressionistUI::cb_load_alpha_brush_image(Fl_Menu_* o, void* v) {
+	ImpressionistDoc* pDoc = whoami(o)->getDocument();
+	char* newfile = fl_file_chooser("Open File?", "*.bmp", pDoc->getImageName());
+	if (newfile != NULL) {
+		pDoc->loadAlphaBrushImage(newfile);
+	}
+}
+
 //---------------------------------- filter dialog functions --------------------------------------
 
 void ImpressionistUI::cb_filter_type_choice(Fl_Widget* o, void* v) {
@@ -554,6 +577,17 @@ void ImpressionistUI::cb_filter_apply_button(Fl_Widget* o, void* v) {
 	else {
 		pDoc->applyFilter(pUI->m_filterType, pUI->m_filterSource, pUI->m_isFilterNormalized);
 	}
+}
+
+
+
+void ImpressionistUI::cb_blend_view_alpha_slide(Fl_Widget* o, void* v)
+{
+	ImpressionistUI* pUI = ((ImpressionistUI*)(o->user_data()));
+	ImpressionistDoc* pDoc = pUI->getDocument();
+	pUI->m_blendViewAlpha = ((Fl_Slider*)o)->value();
+	pDoc->updateViewImage();
+	pUI->m_paintView->refresh();
 }
 
 
@@ -734,6 +768,10 @@ void ImpressionistUI::setBlueVal(double B)
 	m_blueVal = B;
 }
 
+double ImpressionistUI::getBlendViewAlpha() {
+	return m_blendViewAlpha;
+}
+
 // Main menu definition
 Fl_Menu_Item ImpressionistUI::menuitems[] = {
 	{ "&File",		0, 0, 0, FL_SUBMENU },
@@ -748,6 +786,7 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 		{ "Load a&nother image...", FL_ALT + 'n', (Fl_Callback*)ImpressionistUI::cb_load_another_image},
 		{ "Load &edge image...", FL_ALT + 'e', (Fl_Callback*)ImpressionistUI::cb_load_edge_image, 0, FL_MENU_DIVIDER },
 		{ "Load &dissolve image...", FL_ALT + 'd', (Fl_Callback*)ImpressionistUI::cb_load_dissolve_image },
+		{ "Load alpha brush image...", FL_ALT + 'v', (Fl_Callback*)ImpressionistUI::cb_load_alpha_brush_image },
 		{ "&Filters...", FL_ALT + 'f', (Fl_Callback*)ImpressionistUI::cb_filters, 0, FL_MENU_DIVIDER },
 
 		{ "&Quit",			FL_ALT + 'q', (Fl_Callback *)ImpressionistUI::cb_exit },
@@ -755,7 +794,8 @@ Fl_Menu_Item ImpressionistUI::menuitems[] = {
 	{ "&View",		0, 0, 0, FL_SUBMENU },
 		{ "&Original",	FL_CTRL + 'o', (Fl_Callback*)ImpressionistUI::cb_view_original, 0, FL_MENU_RADIO | FL_MENU_VALUE},
 		{ "&Another",	FL_CTRL + 'a', (Fl_Callback*)ImpressionistUI::cb_view_another, 0, FL_MENU_RADIO },
-		{ "&Edge",	FL_CTRL + 'e', (Fl_Callback*)ImpressionistUI::cb_view_edge, 0, FL_MENU_RADIO },
+		{ "&Edge",	FL_CTRL + 'e', (Fl_Callback*)ImpressionistUI::cb_view_edge, 0, FL_MENU_RADIO | FL_MENU_DIVIDER },
+		{ "&View blending...", FL_CTRL + 'b', (Fl_Callback*)ImpressionistUI::cb_blend_view },
 		{ 0 },
 	{ "&Help",		0, 0, 0, FL_SUBMENU },
 		{ "&About",	FL_ALT + 'a', (Fl_Callback *)ImpressionistUI::cb_about },
@@ -777,6 +817,7 @@ Fl_Menu_Item ImpressionistUI::brushTypeMenu[NUM_BRUSH_TYPE+1] = {
   {"Blur",	FL_ALT + 'u', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_BLUR},
   {"Warp",	FL_ALT + 'w', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_WARP},
   {"Smudge",	FL_ALT + 'z', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_SMUDGE},
+  {"Alpha Map",	FL_ALT + 'v', (Fl_Callback*)ImpressionistUI::cb_brushChoice, (void*)BRUSH_ALPHA},
   {0}
 };
 
@@ -849,6 +890,8 @@ ImpressionistUI::ImpressionistUI() {
 	m_redVal = 1.0;
 	m_greenVal = 1.0;
 	m_blueVal = 1.0;
+
+	m_blendViewAlpha = 0.5;
 
 	// brush dialog definition
 	m_brushDialog = new Fl_Window(400, 325, "Brush Dialog");
@@ -1035,6 +1078,20 @@ ImpressionistUI::ImpressionistUI() {
 
 	m_filterDialog->end();
 
+
+	m_blendViewDialog = new Fl_Double_Window(500, 100, "View Blending Dialog");
+		m_blendViewAlphaSlider = new Fl_Value_Slider(10, 25, 300, 20, "Blending alpha");
+		m_blendViewAlphaSlider->user_data((void*)(this));	// record self to be used by static callback functions
+		m_blendViewAlphaSlider->type(FL_HOR_NICE_SLIDER);
+		m_blendViewAlphaSlider->labelfont(FL_COURIER);
+		m_blendViewAlphaSlider->labelsize(12);
+		m_blendViewAlphaSlider->minimum(0.00);
+		m_blendViewAlphaSlider->maximum(1.00);
+		m_blendViewAlphaSlider->step(0.01);
+		m_blendViewAlphaSlider->value(m_blendViewAlpha);
+		m_blendViewAlphaSlider->align(FL_ALIGN_RIGHT);
+		m_blendViewAlphaSlider->callback(cb_blend_view_alpha_slide);
+	m_blendViewDialog->end();
 
 	m_lineOverlay = new LineOverlay();
 	m_marker = new Marker();

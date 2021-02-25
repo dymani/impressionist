@@ -29,6 +29,7 @@
     <ClCompile Include="include\imgwarp\imgwarp_mls_similarity.cpp" />
     <ClCompile Include="include\imgwarp\imgwarp_piecewiseaffine.cpp" />
     <ClCompile Include="SmudgeBrush.cpp" />
+    <ClCompile Include="AlphaMappedBrush.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
@@ -59,5 +60,6 @@
     <ClInclude Include="include\imgwarp\imgwarp_mls_similarity.h" />
     <ClInclude Include="include\imgwarp\imgwarp_piecewiseaffine.h" />
     <ClInclude Include="SmudgeBrush.h" />
+    <ClInclude Include="AlphaMappedBrush.h" />
   </ItemGroup>
 </Project>

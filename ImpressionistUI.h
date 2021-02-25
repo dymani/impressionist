@@ -74,6 +74,10 @@ public:
 	Fl_Light_Button* m_filterNormalizeLightButton;
 	Fl_Button* m_filterApplyButton;
 
+// for blend view dialog
+	Fl_Window* m_blendViewDialog;
+	Fl_Slider* m_blendViewAlphaSlider;
+
 	// Member functions
 	void				setDocument(ImpressionistDoc* doc);
 	ImpressionistDoc*	getDocument();
@@ -101,6 +105,8 @@ public:
 	void				setGreenVal(double G);
 	double				getBlueVal();
 	void				setBlueVal(double B);
+
+	double getBlendViewAlpha();
 	
 private:
 	ImpressionistDoc*	m_pDoc;		// pointer to document to communicate with the document
@@ -129,6 +135,8 @@ private:
 	int m_filterHeight;
 	bool m_isFilterNormalized;
 
+	double m_blendViewAlpha;
+
 	// Static class members
 	static Fl_Menu_Item		menuitems[];
 	static Fl_Menu_Item		brushTypeMenu[NUM_BRUSH_TYPE+1];
@@ -151,12 +159,14 @@ private:
 	static void cb_load_another_image(Fl_Menu_* o, void* v);
 	static void cb_load_edge_image(Fl_Menu_* o, void* v);
 	static void cb_load_dissolve_image(Fl_Menu_* o, void* v);
+	static void cb_load_alpha_brush_image(Fl_Menu_* o, void* v);
 	static void	cb_exit(Fl_Menu_* o, void* v);
 	static void	cb_about(Fl_Menu_* o, void* v);
 	static void	cb_filters(Fl_Menu_* o, void* v);
 	static void	cb_view_original(Fl_Menu_* o, void* v);
 	static void	cb_view_another(Fl_Menu_* o, void* v);
 	static void	cb_view_edge(Fl_Menu_* o, void* v);
+	static void	cb_blend_view(Fl_Menu_* o, void* v);
 
 	static void	cb_brushChoice(Fl_Widget* o, void* v);
 	static void	cb_clear_canvas_button(Fl_Widget* o, void* v);
@@ -179,6 +189,8 @@ private:
 	static void cb_filter_height_input(Fl_Widget* o, void* v);
 	static void cb_filter_normalize_light_button(Fl_Widget* o, void* v);
 	static void cb_filter_apply_button(Fl_Widget* o, void* v);
+
+	static void cb_blend_view_alpha_slide(Fl_Widget* o, void* v);
 
 };
 
