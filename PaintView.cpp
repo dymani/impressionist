@@ -113,6 +113,7 @@ void PaintView::draw()
 			m_pDoc->m_pCurrentBrush->BrushBegin( source, target );
 			m_pDoc->m_pUI->m_marker->update(source);
 			m_pDoc->m_pUI->m_origView->refresh();
+			SaveCurrentContent();
 			m_pDoc->updateViewImage();
 			drawView();
 			break;
