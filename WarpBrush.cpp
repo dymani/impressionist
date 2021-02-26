@@ -20,6 +20,7 @@ WarpBrush::WarpBrush(ImpressionistDoc* pDoc, char* name)
 	m_paintingCopy = nullptr;
 }
 
+#include <iostream>
 void WarpBrush::BrushBegin(const IPoint source, const IPoint target) {
 	ImpressionistDoc* pDoc = GetDocument();
 
@@ -31,7 +32,15 @@ void WarpBrush::BrushBegin(const IPoint source, const IPoint target) {
 	m_size = pDoc->getSize() * 2;
 	m_strength = pDoc->getStrength();
 
-	m_start = { target.x, target.y };
+	int windowHeight = pDoc->m_pUI->m_paintView->getWindowHeight();
+
+	int width = pDoc->m_nWidth;
+	int height = pDoc->m_nHeight;
+
+	int hOffset = -(windowHeight - height);
+
+	m_start = { target.x, target.y + hOffset };
+	//std::cout << target.x << " " << target.y << std::endl;
 
 	if (m_paintingCopy) delete[] m_paintingCopy;
 	m_paintingCopy = new unsigned char[pDoc->m_nWidth * pDoc->m_nHeight * 3];
@@ -56,11 +65,15 @@ void WarpBrush::BrushMove(const IPoint source, const IPoint target) {
 		return;
 	}
 
+	int windowHeight = pDoc->m_pUI->m_paintView->getWindowHeight();
+
 	int width = pDoc->m_nWidth;
 	int height = pDoc->m_nHeight;
 
+	int hOffset = -(windowHeight - height);
+
 	int Dx = target.x - m_start.x;
-	int Dy = target.y - m_start.y;
+	int Dy = target.y - m_start.y + hOffset;
 	double dist = sqrt(Dx * Dx + Dy * Dy);
 	double distLimit = m_size / 2.0 * m_strength;
 	double theta = atan2(Dy, Dx);
@@ -81,30 +94,30 @@ void WarpBrush::BrushMove(const IPoint source, const IPoint target) {
 	std::vector<cv::Point> anchorBefore;
 	std::vector<cv::Point> anchorAfter;
 	{
-		anchorBefore.push_back(cv::Point{ 0, 0 });
-		anchorBefore.push_back(cv::Point{ 0, height - 1 });
-		anchorBefore.push_back(cv::Point{ width - 1, 0 });
-		anchorBefore.push_back(cv::Point{ width - 1, height - 1 });
+		anchorBefore.push_back(cv::Point{ 0, 0 + 0 });
+		anchorBefore.push_back(cv::Point{ 0, height - 1  + 0 });
+		anchorBefore.push_back(cv::Point{ width - 1, 0  + 0 });
+		anchorBefore.push_back(cv::Point{ width - 1, height - 1  + 0 });
 
-		anchorAfter.push_back(cv::Point{ 0, 0 });
-		anchorAfter.push_back(cv::Point{ 0, height - 1 });
-		anchorAfter.push_back(cv::Point{ width - 1, 0 });
-		anchorAfter.push_back(cv::Point{ width - 1, height - 1 });;
+		anchorAfter.push_back(cv::Point{ 0, 0 + 0 });
+		anchorAfter.push_back(cv::Point{ 0, height - 1 + 0 });
+		anchorAfter.push_back(cv::Point{ width - 1, 0 + 0 });
+		anchorAfter.push_back(cv::Point{ width - 1, height - 1 + 0 });;
 	}
 	{
-		anchorBefore.push_back(cv::Point{ left, top });
-		anchorBefore.push_back(cv::Point{ right, top });
-		anchorBefore.push_back(cv::Point{ left, down });
-		anchorBefore.push_back(cv::Point{ right, down });
+		anchorBefore.push_back(cv::Point{ left, top + 0 });
+		anchorBefore.push_back(cv::Point{ right, top + 0 });
+		anchorBefore.push_back(cv::Point{ left, down + 0 });
+		anchorBefore.push_back(cv::Point{ right, down + 0 });
 
-		anchorAfter.push_back(cv::Point{ left, top });
-		anchorAfter.push_back(cv::Point{ right, top });
-		anchorAfter.push_back(cv::Point{ left, down });
-		anchorAfter.push_back(cv::Point{ right, down });
+		anchorAfter.push_back(cv::Point{ left, top + 0 });
+		anchorAfter.push_back(cv::Point{ right, top + 0 });
+		anchorAfter.push_back(cv::Point{ left, down + 0 });
+		anchorAfter.push_back(cv::Point{ right, down + 0 });
 	}
 	{
-		anchorBefore.push_back(m_start);
-		anchorAfter.push_back(m_start + cv::Point{ Dx, Dy });
+		anchorBefore.push_back(m_start + cv::Point{ 0, 0 });
+		anchorAfter.push_back(m_start + cv::Point{ Dx, Dy + 0 });
 	}
 	cv::Point line, proj;
 	/*int dir;
@@ -118,11 +131,11 @@ void WarpBrush::BrushMove(const IPoint source, const IPoint target) {
 	}*/
 	for (int i = 0; i < 8; ++i) {
 		line = cv::Point{ int(m_size / 2.0 * cos(i * PI / 4)) , int(m_size / 2.0 * sin(i * PI / 4)) };
-		anchorBefore.push_back(m_start + line);
+		anchorBefore.push_back(m_start + line + cv::Point{ 0, 0 + 0 });
 		double angle = i * PI / 4 - theta;
 		if (angle >= PI) angle -= 2 * PI;
 		if (angle <= -PI) angle += 2 * PI;
-		anchorAfter.push_back(m_start + line + cv::Point{ int(Dx / cosh(angle)), int(Dy / cosh(angle)) });
+		anchorAfter.push_back(m_start + line + cv::Point{ int(Dx / cosh(angle)), int(Dy / cosh(angle)) + 0 });
 	}
 
 	Mat result = m_imageWarp->setAllAndGenerate(
